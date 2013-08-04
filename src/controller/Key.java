@@ -4,17 +4,22 @@ import java.util.LinkedList;
 
 public class Key {
 	public LinkedList<Boolean> nextState;
-	public boolean wasDown = false;
-	public boolean isDown = false;
+	public boolean wasDown;
+	public boolean isDown;
 
 	public Key(InputHandler handler) {
 		nextState = new LinkedList<Boolean>();
+		clear();
 		handler.addToKeys(this);
 	}
 
 	public void toggle(boolean press) {
 		if (nextState.isEmpty() || press != nextState.getLast())
 			nextState.add(press);
+		else {
+			nextState.add(!press);
+			nextState.add(press);
+		}
 	}
 
 	public void tick() {
@@ -56,6 +61,8 @@ public class Key {
 
 	public void clear() {
 		nextState.clear();
+		wasDown = false;
+		isDown = false;
 	}
 }
 

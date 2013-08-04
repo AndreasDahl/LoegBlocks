@@ -27,9 +27,7 @@ public class GameFrame extends Canvas implements Runnable {
 	
 	private static JFrame frame;
 	private static GameFrame instance;
-	
-	private Board board;
-	private Component mainMenu;
+
 	private BufferedImage image;
 	private int[] pixels;
 	private boolean running;
@@ -48,9 +46,6 @@ public class GameFrame extends Canvas implements Runnable {
 		this.addKeyListener(gameControl);
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
-		
-
-		mainMenu = new MainMenu();
 	}
 	
 	public static GameFrame getInstance() {
@@ -64,10 +59,8 @@ public class GameFrame extends Canvas implements Runnable {
 	}
 	
 	public void start() {
-		if (board == null)
-			board = new Board();
 		running = true;
-		activeComponent = mainMenu;
+		activeComponent = new MainMenu();
 		new Thread(this).start();
 	}
 	
@@ -144,28 +137,19 @@ public class GameFrame extends Canvas implements Runnable {
 		bs.show();
 	}
 	
-	public Component getBoard() {
-		return board;
-	}
-	
 	public long getTime() {
 		return System.nanoTime();
 	}
 	
-	public void gotoMenu(GuiComponent menu) {
-		activeComponent = menu;
+	public void setComponent(Component component) {
+		gameControl.clearAll();
+		activeComponent = component;
 	}
 	
 	public void startGame() {
+		Board board = new Board();
+		setComponent(board);
 		board.newGame();
-		activeComponent = board;
-	}
-	
-	public void setState(State state) {
-		if (state == State.GAME) activeComponent = board;
-		if (state == State.MAIN_MENU) activeComponent = mainMenu;
-		if (state == State.PAUSE_MENU) activeComponent = mainMenu;
-		gameControl.clearAll();
 	}
  	
 	public static void main(String[] args) {

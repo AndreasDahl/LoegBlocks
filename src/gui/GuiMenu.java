@@ -15,6 +15,8 @@ public class GuiMenu extends GuiComponent {
 	
 	public GuiMenu(int x, int y, int width, int height) {
 		super(x, y, width, height);
+		
+		pointer = 0;
 	}
 	
 	public GuiMenu() {

@@ -21,7 +21,7 @@ public class HighscoresMenu extends GuiMenu {
 	class BackListener implements ButtonListener {
 		@Override
 		public void buttonPressed() {
-			GameFrame.getInstance().gotoMenu(new MainMenu());
+			GameFrame.getInstance().setComponent(new MainMenu());
 		}
 	}
 	

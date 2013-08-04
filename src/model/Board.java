@@ -128,7 +128,7 @@ public class Board extends Component {
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
-			GameFrame.getInstance().gotoMenu(new MainMenu());
+			GameFrame.getInstance().setComponent(new MainMenu());
 		}		
 	}
 	
@@ -339,7 +339,7 @@ public class Board extends Component {
 			} catch (InterruptedException e) {
 				// Do nothing
 			}
-			GameFrame.getInstance().gotoMenu(new MainMenu());
+			GameFrame.getInstance().setComponent(new MainMenu());
 		}
 		timer.newTime();
 		ticksSinceMove++;
