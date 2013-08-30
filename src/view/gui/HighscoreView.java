@@ -1,4 +1,4 @@
-package gui;
+package view.gui;
 
 import java.util.LinkedList;
 
@@ -11,8 +11,8 @@ public class HighscoreView extends GuiComponent {
 	private int scoresShown = 10;
 	private LinkedList<Long> scores;
 	
-	public HighscoreView(int x, int y, int width, int height) {
-		super(x , y, width, height);
+	public HighscoreView(int width, int height) {
+		super(width, height);
 		
 		refresh();
 	}

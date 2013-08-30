@@ -1,21 +1,20 @@
-package gui;
+package view.gui;
 
 import view.Art;
 import view.GameFrame;
 import view.Screen;
-import gui.ButtonListener;
 
 public class MainMenu extends GuiMenu {
 	private Button startGame;
 	
 	public MainMenu() {
 		super();
-		startGame = new Button(getWidth()/2-100, 100, 200, 100, Art.BUTTON, "New Game");
+		startGame = new Button(200, 100, Art.BUTTON, "New Game");
 		startGame.addButtonListener(new StartGameListener());
-		addButton(startGame);
-		Button highscores = new Button(getWidth()/2-150, 200, 300, 100, Art.BUTTON, "Highscores");
-		highscores.addButtonListener(new HighscoreListener()); 
-		addButton(highscores);
+		addButton(startGame, getWidth()/2-100, 100);
+		Button highScores = new Button(300, 100, Art.BUTTON, "Highscores");
+		highScores.addButtonListener(new HighscoreListener());
+		addButton(highScores, getWidth()/2-150, 200);
 	}
 	
 	class StartGameListener implements ButtonListener {

@@ -1,4 +1,4 @@
-package gui;
+package view.gui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +17,14 @@ public class Button extends GuiComponent {
 	private String text;
 	
 	
-	public Button(int x, int y, int width, int height, Sprite sprite) {
-		super(x, y, width, height);
+	public Button(int width, int height, Sprite sprite) {
+		super(width, height);
 		this.sprite = sprite;
 		this.text = null;
 	}
 	
-	public Button(int x, int y, int width, int height, Sprite sprite, String text) {
-		super(x, y, width, height);
+	public Button(int width, int height, Sprite sprite, String text) {
+		super(width, height);
 		this.sprite = sprite;
 		this.text = text;
 	}

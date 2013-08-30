@@ -1,4 +1,4 @@
-package gui;
+package view.gui;
 
 import view.Screen;
 import controller.InputHandler;

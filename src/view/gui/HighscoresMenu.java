@@ -1,9 +1,8 @@
-package gui;
+package view.gui;
 
 import view.Art;
 import view.GameFrame;
 import view.Screen;
-import gui.ButtonListener;
 
 public class HighscoresMenu extends GuiMenu {
 	private Button backButton;
@@ -11,11 +10,12 @@ public class HighscoresMenu extends GuiMenu {
 	
 	public HighscoresMenu() {
 		super();
-		backButton = new Button(getWidth()/2-100, getHeight()-75, 200, 50, Art.BUTTON, "Back");
+		backButton = new Button(200, 50, Art.BUTTON, "Back");
 		backButton.addButtonListener(new BackListener());
-		addButton(backButton);
+		addButton(backButton, getWidth()/2-100, getHeight()-75);
 		
-		highscoreView = new HighscoreView(50, 50, getWidth()-100, getHeight()-200);
+		highscoreView = new HighscoreView(getWidth()-100, getHeight()-200);
+        addChild(highscoreView, 50, 50);
 	}
 	
 	class BackListener implements ButtonListener {

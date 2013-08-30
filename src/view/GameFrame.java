@@ -1,8 +1,9 @@
 package view;
 
-import gui.Component;
-import gui.GuiComponent;
-import gui.MainMenu;
+import view.gui.Component;
+import view.gui.GameView;
+import view.gui.GuiComponent;
+import view.gui.MainMenu;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -34,11 +35,6 @@ public class GameFrame extends Canvas implements Runnable {
 	private Screen screen;
 	private InputHandler gameControl;
 	private Component activeComponent;
-	
-	private enum State {
-		MAIN_MENU, PAUSE_MENU, GAME
-	}
-	
 	
 	public GameFrame() {
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -147,9 +143,9 @@ public class GameFrame extends Canvas implements Runnable {
 	}
 	
 	public void startGame() {
-		Board board = new Board();
-		setComponent(board);
-		board.newGame();
+        GameView gameView = new GameView();
+		setComponent(gameView);
+		gameView.getBoard().newGame();
 	}
  	
 	public static void main(String[] args) {

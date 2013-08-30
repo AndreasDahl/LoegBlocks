@@ -1,4 +1,4 @@
-package gui;
+package view.gui;
 
 import java.util.ArrayList;
 
@@ -13,8 +13,8 @@ public class GuiMenu extends GuiComponent {
 	private int pointer;
 	private Button selected;
 	
-	public GuiMenu(int x, int y, int width, int height) {
-		super(x, y, width, height);
+	public GuiMenu(int width, int height) {
+		super(width, height);
 		
 		pointer = 0;
 	}
@@ -70,18 +70,16 @@ public class GuiMenu extends GuiComponent {
 	public void render(Screen screen) {
 		if (this.background != null)
 			screen.render(0, 0, getHeight(), getWidth(), background);
-		
-		for (Button button : buttons) {
-			button.render(screen);
-		}
+
+        super.render(screen);
 	}
 
 	protected int getPointer() {
 		return pointer;
 	}
 	
-	
-	protected void addButton(Button button) {
+	protected void addButton(Button button, int x, int y) {
+        addChild(button, x, y);
 		buttons.add(button);
 	}
 }

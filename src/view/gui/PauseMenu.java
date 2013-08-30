@@ -1,4 +1,4 @@
-package gui;
+package view.gui;
 
 import view.GameFrame;
 import view.Screen;

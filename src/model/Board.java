@@ -1,7 +1,7 @@
 package model;
 
-import gui.Component;
-import gui.MainMenu;
+import view.gui.GuiComponent;
+import view.gui.MainMenu;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,7 +16,7 @@ import model.tetromino.Tetromino;
 import model.tetromino.Tetromino.Type;
 
 
-public class Board extends Component {
+public class Board extends GuiComponent {
 	public static final int LINE_WIDTH = 10;
 	public static final int LINE_AMOUNT = 23;
 	public static final int MOVES_PER_SECOND = 1;
@@ -28,12 +28,13 @@ public class Board extends Component {
 	public static final int HIDDEN_ROWS = 3;
 	public static final int HEIGHT = (LINE_AMOUNT-HIDDEN_ROWS)*BLOCK_SCALE;
 	public static final int GOAL_LINES = 40;
+    public static final int PREVIEW_COUNT = 4;
 	
 	private TetrominoBag bag;
 	private Block[][] rows;
 	private Tetromino tetromino;
-	private LinkedList<Preview> next = new LinkedList<Preview>();
-	private Preview hold;
+	private LinkedList<Tetromino> next = new LinkedList<Tetromino>();
+	private Tetromino hold;
 	private int ticksSinceMove;
 	private int linesCleared;
 	private Timer timer;
@@ -41,18 +42,18 @@ public class Board extends Component {
 	private LinkedList<Long> scores;
 	private long latestScore;
 	private boolean hasHeld;
+    private onHoldListener onHoldListener;
 
 	//private static Board current;
 	
    	public Board() {
    		super();
 		bag = new TetrominoBag();
-		
-		next.add(new Preview(PLACEMENT_X + WIDTH + 24, BLOCK_SCALE));
-		next.add(new Preview(PLACEMENT_X + WIDTH + 24, BLOCK_SCALE*6));
-		next.add(new Preview(PLACEMENT_X + WIDTH + 24, BLOCK_SCALE*11));
-		next.add(new Preview(PLACEMENT_X + WIDTH + 24, BLOCK_SCALE*16));
-		hold = new Preview(24, 24);
+        next = new LinkedList<Tetromino>();
+
+        setWidth(WIDTH);
+        setHeight(HEIGHT);
+
 		timer = new Timer();
 		scoreboard = new DbScoreboard();
 		
@@ -77,14 +78,23 @@ public class Board extends Component {
 		linesCleared = 0;
 		scores = scoreboard.getTop(10);
 	}
+
+    public boolean hasHeld() {
+        return this.hasHeld;
+    }
 	
 	private void clearBoard() {
 		rows = new Block[LINE_AMOUNT][LINE_WIDTH];
-		for (Preview preview : next) {
-			preview.setTetromino(null);
-		}
-		hold.setTetromino(null);
+		next = new LinkedList<Tetromino>();
+		setHold(null);
 	}
+
+    private void setHold(Tetromino tetromino) {
+        hold = tetromino;
+        if (onHoldListener != null) {
+            this.onHoldListener.onHold(tetromino);
+        }
+    }
 	
 	public void clearFullLines() {
 		for (int i = 0; i < rows.length; i++) {
@@ -112,18 +122,18 @@ public class Board extends Component {
 	}
 	
 	public void getNextTetromino() {
-		Iterator<Preview> it = next.iterator();
-		Preview p;
-		p = it.next();
-		tetromino = p.getTetromino();
-		while (it.hasNext()) {
-			Preview p2 = it.next();
-			p.setTetromino(p2.getTetromino());
-			p = p2;
-		}
-		p.setTetromino(bag.draw());
+		Iterator<Tetromino> it = next.iterator();
+
+        if (it.hasNext()) {
+            tetromino = next.pop();
+            next.add(bag.draw());
+        } else {
+            tetromino = bag.draw();
+        }
+
 		if (isLost()) {
 			try {
+                System.out.println("LOSE");
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// Do nothing
@@ -143,24 +153,25 @@ public class Board extends Component {
 	public void hold() {
 		if (!hasHeld) {
 			hasHeld = true;
-			if (hold.getTetromino() == null) {
+			if (hold == null) {
 				tetromino.initializePositions();
-				hold.setTetromino(tetromino);
+                setHold(tetromino);
 				getNextTetromino();
 			}
 			else {
 				tetromino.initializePositions();
-				Tetromino tmp = hold.getTetromino();
-				hold.setTetromino(tetromino);
-				tetromino = tmp;
+				Tetromino tmp = hold;
+				setHold(tetromino);
+                tetromino = tmp;
 			}
 		}	
 	}
 	
 	private void initializeTetrominoes() {
 		tetromino = bag.draw();
-		for (Preview preview : next) {
-			preview.setTetromino(bag.draw());
+		next = new LinkedList<Tetromino>();
+        for (int i = 0; i < PREVIEW_COUNT; i++) {
+            next.add(bag.draw());
 		}
 		
 	}
@@ -223,15 +234,16 @@ public class Board extends Component {
 	
 	@Override
 	public void render(Screen screen) {
-		screen.render(0, 0, Art.BG);
-		renderProgressBar(screen);
-		renderBlocks(screen);
+		//renderProgressBar(screen);
+		screen.renderBlank(getX(), getY(), getWidth(), getHeight(), 0xff000000);
+        renderBlocks(screen);
 		renderGhost(screen);
 		renderTetromino(screen);
-		renderPreviews(screen);
-		renderHold(screen);
-		renderTimer(screen);
-		renderOldTimes(screen);
+
+		super.render(screen);
+		//renderHold(screen);
+		//renderTimer(screen);
+		//renderOldTimes(screen);
 	}
 	
 	private void renderBlocks(Screen screen) {
@@ -240,10 +252,10 @@ public class Board extends Component {
 			for (int x = 0; x < row.length; x++) {
 				Block block = row[x];
 				if (block == null) {
-					//screen.renderBlank(x*BLOCK_SCALE+PLACEMENT_X, y*BLOCK_SCALE+PLACEMENT_Y, BLOCK_SCALE, BLOCK_SCALE, 0x00ff00);
+					//screen.renderBlank(x*BLOCK_SCALE+getX(), y*BLOCK_SCALE+getY(), BLOCK_SCALE, BLOCK_SCALE, 0x00ff00);
 				}
 				else {
-					screen.render(x*BLOCK_SCALE+PLACEMENT_X, (y-HIDDEN_ROWS)*BLOCK_SCALE+PLACEMENT_Y, Tetromino.getSprite(block.getType()));
+					screen.render(x*BLOCK_SCALE+getX(), (y-HIDDEN_ROWS)*BLOCK_SCALE+getY(), Tetromino.getSprite(block.getType()));
 				}
 			}
 		}
@@ -254,8 +266,8 @@ public class Board extends Component {
 		for (Point point : gSelection) {
 			int yy = point.getY()-HIDDEN_ROWS;
 			if (yy >= 0) {
-				int x = point.getX()*BLOCK_SCALE+PLACEMENT_X;
-				int y = yy*BLOCK_SCALE+PLACEMENT_Y;
+				int x = point.getX()*BLOCK_SCALE+getX();
+				int y = yy*BLOCK_SCALE+getY();
 				screen.renderHue(x, y, Art.GHOST, tetromino.getColor() & 0xffffff | 0xff000000);
 			}
 		}
@@ -272,19 +284,16 @@ public class Board extends Component {
 		}
 		
 	}
-	
-	private void renderPreviews(Screen screen) {
-		for (Preview preview : next) {
-			preview.render(screen);
-		}
-	}
-	
-	private void renderHold(Screen screen) {
-		if (hasHeld)
-			hold.renderGray(screen);
-		else
-			hold.render(screen);
-	}
+
+    public void addHoldListener(onHoldListener listener) {
+        this.onHoldListener = listener;
+    }
+
+    public interface onHoldListener {
+        public void onHold(Tetromino tetromino);
+    }
+
+
 	
 	private void renderProgressBar(Screen screen) {
 		int lClear = linesCleared;
@@ -293,9 +302,9 @@ public class Board extends Component {
 		int offset = HEIGHT/GOAL_LINES * lClear;
 		if (offset > HEIGHT) offset = HEIGHT;
 		
-		screen.renderBlank(PLACEMENT_X, PLACEMENT_Y+offset, WIDTH, HEIGHT-offset, 0xff220000);
-		screen.renderBlank(PLACEMENT_X, PLACEMENT_Y+offset, WIDTH, 2, 0xff550000);
-		screen.renderBlank(PLACEMENT_X-6, PLACEMENT_Y+offset, 6, HEIGHT-offset, 0xffff0000);
+		screen.renderBlank(getX(), getY()+offset, WIDTH, HEIGHT-offset, 0xff220000);
+		screen.renderBlank(getX(), getY()+offset, WIDTH, 2, 0xff550000);
+		screen.renderBlank(getX()-6, getY()+offset, 6, HEIGHT-offset, 0xffff0000);
 		
 		Art.FONT.render(0, GameFrame.HEIGHT-12, "Lines Left " + (GOAL_LINES - linesCleared), screen);
 		Art.FONT.render(5, 200, 48, Integer.toString(GOAL_LINES - linesCleared), screen);
@@ -303,9 +312,9 @@ public class Board extends Component {
 	
 	private void renderTetromino(Screen screen) {
 		for (Point point : tetromino.getSelection()) {
-			int yy = PLACEMENT_Y + GameFrame.BLOCK_SCALE * point.getY() - BLOCK_SCALE * HIDDEN_ROWS;
-			if (yy >= PLACEMENT_Y)
-				screen.render(PLACEMENT_X + GameFrame.BLOCK_SCALE * point.getX(), yy, tetromino.getSprite());
+			int yy = getY() + GameFrame.BLOCK_SCALE * point.getY() - BLOCK_SCALE * HIDDEN_ROWS;
+			if (yy >= getY())
+				screen.render(getX() + GameFrame.BLOCK_SCALE * point.getX(), yy, tetromino.getSprite());
 		}
 	}
 	
@@ -335,6 +344,7 @@ public class Board extends Component {
 		if (isWon()) {
 			addOldTime(timer.clone());
 			try {
+                System.out.println("WIN");
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// Do nothing
