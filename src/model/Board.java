@@ -3,8 +3,10 @@ package model;
 import view.gui.GuiComponent;
 import view.gui.MainMenu;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import controller.InputHandler;
 
@@ -24,32 +26,36 @@ public class Board extends GuiComponent {
 	public static final int PLACEMENT_X = 148;
 	public static final int PLACEMENT_Y = 24;
 	public static final int BLOCK_SCALE = GameFrame.BLOCK_SCALE;
-	public static final int WIDTH = LINE_WIDTH*BLOCK_SCALE;
+    public static final int PROGRESS_BAR_WIDTH = 6;
+	public static final int WIDTH = LINE_WIDTH*BLOCK_SCALE + PROGRESS_BAR_WIDTH;
 	public static final int HIDDEN_ROWS = 3;
 	public static final int HEIGHT = (LINE_AMOUNT-HIDDEN_ROWS)*BLOCK_SCALE;
 	public static final int GOAL_LINES = 40;
     public static final int PREVIEW_COUNT = 4;
+
 	
 	private TetrominoBag bag;
 	private Block[][] rows;
 	private Tetromino tetromino;
 	private LinkedList<Tetromino> next = new LinkedList<Tetromino>();
-	private Tetromino hold;
+	private Preview hold;
 	private int ticksSinceMove;
 	private int linesCleared;
 	private Timer timer;
 	private DbScoreboard scoreboard;
 	private LinkedList<Long> scores;
 	private long latestScore;
-	private boolean hasHeld;
-    private onHoldListener onHoldListener;
+    private NextTetrominoesChangedListener nextTetrominoesChangedListener;
 
 	//private static Board current;
-	
+
+
+
    	public Board() {
    		super();
 		bag = new TetrominoBag();
         next = new LinkedList<Tetromino>();
+        hold = new Preview();
 
         setWidth(WIDTH);
         setHeight(HEIGHT);
@@ -78,22 +84,15 @@ public class Board extends GuiComponent {
 		linesCleared = 0;
 		scores = scoreboard.getTop(10);
 	}
-
-    public boolean hasHeld() {
-        return this.hasHeld;
-    }
 	
 	private void clearBoard() {
 		rows = new Block[LINE_AMOUNT][LINE_WIDTH];
 		next = new LinkedList<Tetromino>();
-		setHold(null);
+        hold.setTetromino(null);
 	}
 
-    private void setHold(Tetromino tetromino) {
-        hold = tetromino;
-        if (onHoldListener != null) {
-            this.onHoldListener.onHold(tetromino);
-        }
+    public Preview getHoldPreivew() {
+        return hold;
     }
 	
 	public void clearFullLines() {
@@ -102,6 +101,10 @@ public class Board extends GuiComponent {
 				linesCleared++;
 		}
 	}
+
+    public Collection<Tetromino> getNextTetrominoes() {
+        return next;
+    }
 	
 	public boolean clearLineIfFull(int lineN) {
 		Block[] line = rows[lineN];
@@ -122,8 +125,8 @@ public class Board extends GuiComponent {
 	}
 	
 	public void getNextTetromino() {
-		Iterator<Tetromino> it = next.iterator();
-
+        // Get next tetromino and generate new one
+        Iterator<Tetromino> it = next.iterator();
         if (it.hasNext()) {
             tetromino = next.pop();
             next.add(bag.draw());
@@ -131,6 +134,11 @@ public class Board extends GuiComponent {
             tetromino = bag.draw();
         }
 
+        // Notify listeners that tetrominoes preview is updated.
+        if (nextTetrominoesChangedListener != null)
+            nextTetrominoesChangedListener.onNextTetrominoesChanged(next);
+
+        // Lose player if game is lost.
 		if (isLost()) {
 			try {
                 System.out.println("LOSE");
@@ -151,17 +159,17 @@ public class Board extends GuiComponent {
 	}
 	
 	public void hold() {
-		if (!hasHeld) {
-			hasHeld = true;
-			if (hold == null) {
+		if (hold.isEnabled()) {
+            hold.setEnabled(false);
+			if (hold.getTetromino() == null) {
 				tetromino.initializePositions();
-                setHold(tetromino);
+                hold.setTetromino(tetromino);
 				getNextTetromino();
 			}
 			else {
 				tetromino.initializePositions();
-				Tetromino tmp = hold;
-				setHold(tetromino);
+				Tetromino tmp = hold.getTetromino();
+				hold.setTetromino(tetromino);
                 tetromino = tmp;
 			}
 		}	
@@ -173,7 +181,8 @@ public class Board extends GuiComponent {
         for (int i = 0; i < PREVIEW_COUNT; i++) {
             next.add(bag.draw());
 		}
-		
+        if (nextTetrominoesChangedListener != null)
+		    nextTetrominoesChangedListener.onNextTetrominoesChanged(next);
 	}
 	
 	public boolean isEmpty(Point p) {
@@ -224,7 +233,7 @@ public class Board extends GuiComponent {
 	}
 	
 	public void placeTetromino() {
-		hasHeld = false;
+		hold.setEnabled(true);
 		for (Point point : tetromino.getSelection()) {
 			addBlock(point, tetromino.getType());
 		}
@@ -234,16 +243,16 @@ public class Board extends GuiComponent {
 	
 	@Override
 	public void render(Screen screen) {
-		//renderProgressBar(screen);
-		screen.renderBlank(getX(), getY(), getWidth(), getHeight(), 0xff000000);
+        screen.renderBlank(getX(), getY(), getWidth()-6, getHeight(), 0xff000000);
+		renderProgressBar(screen);
         renderBlocks(screen);
 		renderGhost(screen);
 		renderTetromino(screen);
 
 		super.render(screen);
 		//renderHold(screen);
-		//renderTimer(screen);
-		//renderOldTimes(screen);
+	    renderTimer(screen);
+		renderOldTimes(screen);
 	}
 	
 	private void renderBlocks(Screen screen) {
@@ -285,29 +294,25 @@ public class Board extends GuiComponent {
 		
 	}
 
-    public void addHoldListener(onHoldListener listener) {
-        this.onHoldListener = listener;
+    @Override
+    public int getX() {
+        return super.getX()+6;
     }
 
-    public interface onHoldListener {
-        public void onHold(Tetromino tetromino);
+    public int getLinesLeft() {
+        return GOAL_LINES - linesCleared;
     }
 
-
-	
-	private void renderProgressBar(Screen screen) {
+    private void renderProgressBar(Screen screen) {
 		int lClear = linesCleared;
 		if (lClear < 0)
 			lClear = 0;
 		int offset = HEIGHT/GOAL_LINES * lClear;
 		if (offset > HEIGHT) offset = HEIGHT;
 		
-		screen.renderBlank(getX(), getY()+offset, WIDTH, HEIGHT-offset, 0xff220000);
-		screen.renderBlank(getX(), getY()+offset, WIDTH, 2, 0xff550000);
-		screen.renderBlank(getX()-6, getY()+offset, 6, HEIGHT-offset, 0xffff0000);
-		
-		Art.FONT.render(0, GameFrame.HEIGHT-12, "Lines Left " + (GOAL_LINES - linesCleared), screen);
-		Art.FONT.render(5, 200, 48, Integer.toString(GOAL_LINES - linesCleared), screen);
+		screen.renderBlank(getX(), getY()+offset, WIDTH-PROGRESS_BAR_WIDTH, HEIGHT-offset, 0xff220000);
+		screen.renderBlank(getX(), getY()+offset, WIDTH-PROGRESS_BAR_WIDTH, 2, 0xff550000);
+		screen.renderBlank(getX()-PROGRESS_BAR_WIDTH, getY()+offset, PROGRESS_BAR_WIDTH, HEIGHT-offset, 0xffff0000);
 	}
 	
 	private void renderTetromino(Screen screen) {
@@ -359,4 +364,12 @@ public class Board extends GuiComponent {
 		while (input.hold.next()) if (input.hold.isClicked()) hold();
 		tetromino.tick(this, input);
 	}
+
+    public void setNextTetrominoesChangedListener(NextTetrominoesChangedListener nextTetrominoesChangedListener) {
+        this.nextTetrominoesChangedListener = nextTetrominoesChangedListener;
+    }
+
+    public interface NextTetrominoesChangedListener {
+        public void onNextTetrominoesChanged(List<Tetromino> tetrominoes);
+    }
 }
