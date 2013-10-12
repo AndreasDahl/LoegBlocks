@@ -43,10 +43,7 @@ public class PauseMenu {
 	}
 	
 	public void tick() {
-		InputHandler input = GameFrame.getInstance().getInputHandler();
-		if (input.rotate.isClicked()) selectionUp();
-		if (input.down.isClicked()) selectionDown();
-		if (input.enter.isClicked()) performAction();
+
 	}
 	
 	public void render(Screen screen) {

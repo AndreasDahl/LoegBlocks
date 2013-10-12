@@ -5,7 +5,7 @@ import view.Screen;
 
 import java.util.ArrayList;
 
-public class GuiComponent extends Component {
+public abstract class GuiComponent {
 	private int x, y, width, height;
     private ArrayList<GuiComponent> children;
     private GuiComponent parent;
@@ -59,12 +59,27 @@ public class GuiComponent extends Component {
         child.parent = this;
     }
 
-    @Override
-    public void render(Screen screen) {
-        super.render(screen);
+    public void tick() {
+        for (GuiComponent child : children) {
+            child.tick();
+        }
+    }
 
+    public void render(Screen screen) {
         for (GuiComponent child : children) {
             child.render(screen);
+        }
+    }
+
+    public void activate() {
+        for (GuiComponent child : children) {
+            child.activate();
+        }
+    }
+
+    public void deactivate() {
+        for (GuiComponent child : children) {
+            child.deactivate();
         }
     }
 }

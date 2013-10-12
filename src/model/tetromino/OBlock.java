@@ -12,7 +12,6 @@ public class OBlock extends Tetromino {
 	
 	@Override
 	public void initializePositions() {
-		super.initializePositions();
 		Point[] select = new Point[3];
 		select[0] = new Point(1, 0);
 		select[1] = new Point(0, 1);

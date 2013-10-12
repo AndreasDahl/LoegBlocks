@@ -3,12 +3,20 @@ package controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class InputHandler implements KeyListener {
-	private ArrayList<Key> keys = new ArrayList<Key>();
+    private static InputHandler instance;
+
+    private LinkedList<OnToggleListener> onToggleListeners;
+    private LinkedList<Toggle> toggles;
+    private ArrayList<Key> keys = new ArrayList<Key>();
 	public Key left, right, up, down, softDrop, hardDrop, rotate, rotateCounter, rotate180, menu, hold, allLeft, allRight, enter;
 	
-	public InputHandler() {
+	private InputHandler() {
+        toggles = new LinkedList<Toggle>();
+        onToggleListeners = new LinkedList<OnToggleListener>();
+
 		left = new Key(this);
 		right = new Key(this);
 		up =  new Key(this);
@@ -24,28 +32,37 @@ public class InputHandler implements KeyListener {
 		allLeft = new Key(this);
 		allRight =  new Key(this);
 	}
-	
+
+    public static InputHandler getInstance() {
+        if (instance == null)
+            instance = new InputHandler();
+        return instance;
+    }
+
+    public synchronized void tick() {
+        while (!toggles.isEmpty()) {
+            Toggle toggle = toggles.removeFirst();
+            toggle(toggle.keyEvent, toggle.down);
+        }
+    }
+
 	@Override
-	public void keyPressed(KeyEvent e) {
-		toggle(e, true);
+	public synchronized void keyPressed(KeyEvent e) {
+		store(e, true);
 	}
 	
-	/*public void tick() {
-		for (Key key : keys) {
-			key.tick();
-		}
-	}*/
-	
 	@Override
-	public void keyReleased(KeyEvent e) {
-		toggle(e, false);
+	public synchronized void keyReleased(KeyEvent e) {
+		store(e, false);
 	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
+
+    private synchronized void store(KeyEvent e, boolean pressed) {
+        toggles.add(new Toggle(e, pressed));
+    }
 	
 	private void toggle(KeyEvent e, boolean pressed) {
 		int key = e.getKeyCode();
@@ -69,9 +86,38 @@ public class InputHandler implements KeyListener {
 		keys.add(key);
 	}
 
-	public void clearAll() {
+	public synchronized void clearAll() {
 		for (Key key : keys) {
 			key.clear();
 		}
 	}
+
+    public synchronized void notifyListeners(Key key, boolean pressed) {
+        LinkedList<OnToggleListener> tmpList = (LinkedList<OnToggleListener>) onToggleListeners.clone();
+        for (OnToggleListener listener : tmpList) {
+            listener.onToggle(key, pressed);
+        }
+    }
+
+    public synchronized void addOnToggleListener(OnToggleListener listener) {
+        onToggleListeners.add(listener);
+    }
+
+    public synchronized boolean removeOnToggleListener(OnToggleListener listener) {
+        return onToggleListeners.remove(listener);
+    }
+
+    public interface OnToggleListener {
+        public void onToggle(Key key, boolean pressed);
+    }
+
+    private class Toggle {
+        public KeyEvent keyEvent;
+        public boolean down;
+
+        Toggle(KeyEvent keyEvent, boolean down) {
+            this.keyEvent = keyEvent;
+            this.down = down;
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package model.tetromino;
 
 import controller.InputHandler;
+import controller.Key;
 import view.Art;
 import view.GameFrame;
 import view.Screen;
@@ -19,7 +20,7 @@ public abstract class Tetromino {
 	private Point[] rel;
 	private int color;
 	private int rotation; // 0 = no, 1 = r, 2 = 180, 3 = l;
-	private int timeToNextLeftMove = -1, timeToNextRightMove = -1, timeToNextDownMove = 0;
+
 	
 	protected static Point[][] KICKS = {{new Point(-1,0), new Point(-1,-1), new Point(0,2), new Point(-1,2)},
 										{new Point(1,0), new Point(1,1), new Point(0,-2), new Point(1,-2)},
@@ -32,14 +33,11 @@ public abstract class Tetromino {
 	
 	public Tetromino(int color) {
 		this.color = color;
-		initializePositions();
+
+        initializePositions();
 	}
-	
-	public void initializePositions() {
-		timeToNextLeftMove = -1;
-		timeToNextRightMove = -1;
-		timeToNextDownMove = 0;
-	}
+
+    public abstract void initializePositions();
 	
 	public abstract Type getType();
 	
@@ -176,29 +174,10 @@ public abstract class Tetromino {
 			board.placeTetromino();
 	}
 	
-	public void hardDrop(Board board) {
-		while (tryMove(board, Direction.DOWN));
-		board.placeTetromino();
-	}
-	
-	public void softDrop(Board board) {
-		boolean hasDropped = false;
-		while (tryMove(board, Direction.DOWN)) hasDropped = true;
-		if (hasDropped)
-			board.resetTicksSinceMove();
-		
-	}
+
 	
 	public void moveToEnd(Board board, Direction dir) {
 		while (tryMove(board, dir));
-	}
-	
-	public void moveAllLeft(Board board) {
-		moveToEnd(board, Direction.LEFT);
-	}
-	
-	public void moveAllRight(Board board) {
-		moveToEnd(board, Direction.RIGHT);
 	}
 	
 	/**
@@ -214,29 +193,29 @@ public abstract class Tetromino {
 		rotation = rotation % 4;
 	}
 
-	public void rotateClockwise(Board board) {
-		Point[] newRel = new Point[3];
-		for (int i = 0; i < rel.length; i++) {
-			newRel[i] = new Point(-rel[i].getY(), rel[i].getX());
-		}
-		if (rotateAlgorithm(board, base, newRel, getKicks()[rotation])) {
-			addRotation(1);
-		}
-	}
-	
-	public void rotateCounterClockwise(Board board) {
-		Point[] newRel = new Point[3];
-		for (int i = 0; i < rel.length; i++) {
-			newRel[i] = new Point(rel[i].getY(), -rel[i].getX());
-		}
-		int r = 0;
-		if (getRotation() == 0) r = 2;
-		if (getRotation() == 1) r = 1;
-		if (getRotation() == 2) r = 0;
-		if (getRotation() == 3) r = 3;
-		if (rotateAlgorithm(board, base, newRel, getKicks()[r]))
-			addRotation(3);
-	}	
+    public void rotateClockwise(Board board) {
+        Point[] newRel = new Point[3];
+        for (int i = 0; i < rel.length; i++) {
+            newRel[i] = new Point(-rel[i].getY(), rel[i].getX());
+        }
+        if (rotateAlgorithm(board, base, newRel, getKicks()[rotation])) {
+            addRotation(1);
+        }
+    }
+
+    public void rotateCounterClockwise(Board board) {
+        Point[] newRel = new Point[3];
+        for (int i = 0; i < rel.length; i++) {
+            newRel[i] = new Point(rel[i].getY(), -rel[i].getX());
+        }
+        int r = 0;
+        if (getRotation() == 0) r = 2;
+        if (getRotation() == 1) r = 1;
+        if (getRotation() == 2) r = 0;
+        if (getRotation() == 3) r = 3;
+        if (rotateAlgorithm(board, base, newRel, getKicks()[r]))
+            addRotation(3);
+    }
 	
 	public void rotate180(Board board) {
 		Point[] newRel = new Point[3];
@@ -303,80 +282,6 @@ public abstract class Tetromino {
 	
 	public Point[] getRel() {
 		return rel;
-	}
-	
-	private void tickMoveLeft(Board board, InputHandler input) {
-		if (input.left.isPressed())	 {
-			if (timeToNextLeftMove <= 0) {
-				tryMove(board, Direction.LEFT);
-				if (timeToNextLeftMove < 0)	timeToNextLeftMove = 10;
-				else timeToNextLeftMove = 3;
-			}
-			else timeToNextLeftMove--;
-		}
-		else
-			timeToNextLeftMove = -1;
-	}
-	
-	private void tickMoveRight(Board board, InputHandler input) {
-		if (input.right.isPressed())	 {
-			if (timeToNextRightMove <= 0) {
-				tryMove(board, Direction.RIGHT);
-				if (timeToNextRightMove < 0) timeToNextRightMove = 10;
-				else timeToNextRightMove = 3;
-			}
-			else timeToNextRightMove--;
-		}
-		else
-			timeToNextRightMove = -1;
-	}
-	
-	private void tickMoveDown(Board board, InputHandler input) {
-		if (input.down.isPressed()) {
-			if (timeToNextDownMove <= 0) {
-				tryMove(board, Direction.DOWN);
-				timeToNextDownMove = 3;
-			}
-			else timeToNextDownMove--;		
-		}
-		else timeToNextDownMove = 0;
-	}
-	
-	public void tick(Board board, InputHandler input) {
-		
-		
-		//move left
-		boolean hasMovedL = false;
-		while (input.left.next()) {
-			hasMovedL = true;
-			tickMoveLeft(board, input);
-		}
-		if (hasMovedL == false) tickMoveLeft(board, input);
-		
-		
-		//move right
-		boolean hasMovedR = false;
-		while (input.right.next()) {
-			hasMovedR = true;
-			tickMoveRight(board, input);
-		}
-		if (!hasMovedR) tickMoveRight(board, input);	
-		
-		//move down
-		boolean hasMovedD = false;
-		while (input.down.next()) {
-			hasMovedD = true;
-			tickMoveDown(board, input);
-		}
-		if (!hasMovedD) tickMoveDown(board, input);
-		
-		while (input.rotate.next()) if (input.rotate.isClicked()) rotateClockwise(board);
-		while (input.rotateCounter.next()) if (input.rotateCounter.isClicked()) rotateCounterClockwise(board);
-		while (input.rotate180.next()) if (input.rotate180.isClicked()) rotate180(board);
-		while (input.allLeft.next()) if (input.allLeft.isClicked()) moveAllLeft(board);
-		while (input.allRight.next()) if (input.allRight.isClicked()) moveAllRight(board);
-		while (input.softDrop.next()) if (input.softDrop.isClicked()) softDrop(board);
-		while (input.hardDrop.next()) if (input.hardDrop.isClicked()) hardDrop(board);
 	}
 	
 	protected Point[][] getKicks() {

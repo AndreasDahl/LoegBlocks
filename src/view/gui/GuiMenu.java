@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import controller.InputHandler;
 
+import controller.Key;
+import view.GameFrame;
 import view.Screen;
 import view.Sprite;
 
-public class GuiMenu extends GuiComponent {
+public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListener {
 	private ArrayList<Button> buttons = new ArrayList<Button>();
 	private Sprite background;
 	private int pointer;
@@ -15,24 +17,37 @@ public class GuiMenu extends GuiComponent {
 	
 	public GuiMenu(int width, int height) {
 		super(width, height);
-		
+
+
+
 		pointer = 0;
 	}
 	
 	public GuiMenu() {
-		super();
+		this(GameFrame.WIDTH, GameFrame.HEIGHT);
 	}
 	
 	public void setBackground(Sprite sprite) {
 		this.background = sprite;
 	}
-	
-	@Override
-	public void tick(InputHandler input) {
-		super.tick(input);
-		
-		while (input.up.next()) if (input.up.isClicked()) selectionUp();
-		while (input.down.next()) if (input.down.isClicked()) selectionDown();
+
+    @Override
+    public void onToggle(Key key, boolean pressed) {
+        InputHandler input = InputHandler.getInstance();
+
+        if (pressed) {
+            if (key == input.up)
+                selectionUp();
+            if (key == input.down)
+                selectionDown();
+            if (key == input.enter)
+                buttons.get(pointer).press();
+        }
+    }
+
+    @Override
+	public void tick() {
+		super.tick();
 		
 		Button oldSelected = selected;
 		selected = buttons.get(pointer);
@@ -43,27 +58,22 @@ public class GuiMenu extends GuiComponent {
 			selected.hover();
 		}
 		
-		while (input.enter.next()) {
-			if (input.enter.isClicked())
-				buttons.get(pointer).press();
-		}
-		
 		for (Button button : buttons) {
 			button.tick();
 		}
 	}
+
+    private void selectionUp() {
+        pointer--;
+        if (pointer < 0) {
+            pointer = buttons.size()-1;
+        }
+    }
 	
 	private void selectionDown() {
 		pointer++;
 		if (pointer >= buttons.size())
 			pointer = 0;
-	}
-	
-	private void selectionUp() {
-		pointer--;
-		if (pointer < 0) {
-			pointer = buttons.size()-1;
-		}
 	}
 	
 	@Override
@@ -82,4 +92,16 @@ public class GuiMenu extends GuiComponent {
         addChild(button, x, y);
 		buttons.add(button);
 	}
+
+    @Override
+    public void activate() {
+        super.activate();
+        InputHandler.getInstance().addOnToggleListener(this);
+    }
+
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        InputHandler.getInstance().removeOnToggleListener(this);
+    }
 }

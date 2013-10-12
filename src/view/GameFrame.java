@@ -1,9 +1,7 @@
 package view;
 
-import view.gui.Component;
 import view.gui.GameView;
 import view.gui.GuiComponent;
-import view.gui.MainMenu;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -12,10 +10,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JFrame;
 
-
-import model.Board;
-
 import controller.InputHandler;
+import view.gui.MainMenu;
 
 public class GameFrame extends Canvas implements Runnable {
 	private static final long serialVersionUID = 5761980091712249788L;
@@ -33,13 +29,11 @@ public class GameFrame extends Canvas implements Runnable {
 	private int[] pixels;
 	private boolean running;
 	private Screen screen;
-	private InputHandler gameControl;
-	private Component activeComponent;
+	private GuiComponent activeComponent;
 	
 	public GameFrame() {
 		this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		gameControl = new InputHandler();
-		this.addKeyListener(gameControl);
+		this.addKeyListener(InputHandler.getInstance());
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 	}
@@ -50,13 +44,9 @@ public class GameFrame extends Canvas implements Runnable {
 		return instance;
 	}
 	
-	public InputHandler getInputHandler() {
-		return gameControl;
-	}
-	
 	public void start() {
 		running = true;
-		activeComponent = new MainMenu();
+		setComponent(new MainMenu());
 		new Thread(this).start();
 	}
 	
@@ -113,7 +103,8 @@ public class GameFrame extends Canvas implements Runnable {
 	}
 	
 	private void tick() {
-		activeComponent.tick(gameControl);
+		activeComponent.tick();
+        InputHandler.getInstance().tick();
 	}
 	
 	public void render() {
@@ -137,8 +128,11 @@ public class GameFrame extends Canvas implements Runnable {
 		return System.nanoTime();
 	}
 	
-	public void setComponent(Component component) {
-		gameControl.clearAll();
+	public void setComponent(GuiComponent component) {
+		InputHandler.getInstance().clearAll();
+        if (activeComponent != null)
+            activeComponent.deactivate();
+        component.activate();
 		activeComponent = component;
 	}
 	

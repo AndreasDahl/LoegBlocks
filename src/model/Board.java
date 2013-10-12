@@ -1,5 +1,6 @@
 package model;
 
+import controller.Key;
 import view.gui.GuiComponent;
 import view.gui.MainMenu;
 
@@ -18,7 +19,7 @@ import model.tetromino.Tetromino;
 import model.tetromino.Tetromino.Type;
 
 
-public class Board extends GuiComponent {
+public class Board extends GuiComponent implements InputHandler.OnToggleListener {
 	public static final int LINE_WIDTH = 10;
 	public static final int LINE_AMOUNT = 23;
 	public static final int MOVES_PER_SECOND = 1;
@@ -46,6 +47,8 @@ public class Board extends GuiComponent {
 	private LinkedList<Long> scores;
 	private long latestScore;
     private NextTetrominoesChangedListener nextTetrominoesChangedListener;
+    private int timeToNextLeftMove = -1, timeToNextRightMove = -1, timeToNextDownMove = 0;
+    private boolean leftPressed, rightPressed, downPressed;
 
 	//private static Board current;
 
@@ -62,7 +65,7 @@ public class Board extends GuiComponent {
 
 		timer = new Timer();
 		scoreboard = new DbScoreboard();
-		
+
 		newGame();
 	}
 
@@ -71,7 +74,9 @@ public class Board extends GuiComponent {
 			current = new Board();
 		return current;
 	}*/
-	
+
+
+
 	public void addBlock(Point position, Type type) {
 		rows[position.getY()][position.getX()] = new Block(type);
 	}
@@ -83,7 +88,15 @@ public class Board extends GuiComponent {
 		timer.restart();
 		linesCleared = 0;
 		scores = scoreboard.getTop(10);
+        initializePositions();
 	}
+
+    private void initializePositions() {
+        tetromino.initializePositions();
+        timeToNextLeftMove = -1;
+        timeToNextRightMove = -1;
+        timeToNextDownMove = 0;
+    }
 	
 	private void clearBoard() {
 		rows = new Block[LINE_AMOUNT][LINE_WIDTH];
@@ -162,20 +175,112 @@ public class Board extends GuiComponent {
 		if (hold.isEnabled()) {
             hold.setEnabled(false);
 			if (hold.getTetromino() == null) {
-				tetromino.initializePositions();
+				initializePositions();
                 hold.setTetromino(tetromino);
 				getNextTetromino();
 			}
 			else {
-				tetromino.initializePositions();
+				initializePositions();
 				Tetromino tmp = hold.getTetromino();
 				hold.setTetromino(tetromino);
                 tetromino = tmp;
 			}
 		}	
 	}
-	
-	private void initializeTetrominoes() {
+
+    @Override
+    public void onToggle(Key key, boolean pressed) {
+        InputHandler input = InputHandler.getInstance();
+
+        if (key == input.left)
+            moveLeft(pressed);
+        if (key == input.right)
+            moveRight(pressed);
+        if (key == input.down)
+            moveDown(pressed);
+        if (pressed) {
+            if (key == input.hold)
+                hold();
+            if (key == input.rotate)
+                tetromino.rotateClockwise(this);
+            if (key == input.rotateCounter)
+                tetromino.rotateCounterClockwise(this);
+            if (key == input.rotate180)
+                tetromino.rotate180(this);
+            if (key == input.allLeft)
+                moveAllLeft();
+            if (key == input.allRight)
+                moveAllRight();
+            if (key == input.softDrop)
+                softDrop();
+            if (key == input.hardDrop)
+                hardDrop();
+        }
+    }
+
+    private void moveLeft(boolean pressed) {
+        leftPressed = pressed;
+        if (pressed)	 {
+            if (timeToNextLeftMove <= 0) {
+                tetromino.tryMove(this, Direction.LEFT);
+                if (timeToNextLeftMove < 0)	timeToNextLeftMove = 11;
+                else timeToNextLeftMove = 4;
+            }
+            else timeToNextLeftMove--;
+        }
+        else
+            timeToNextLeftMove = -1;
+    }
+
+    public void moveRight(boolean pressed) {
+        rightPressed = pressed;
+        if (pressed) {
+            if (timeToNextRightMove <= 0) {
+                tetromino.tryMove(this, Direction.RIGHT);
+                if (timeToNextRightMove < 0) timeToNextRightMove = 11;
+                else timeToNextRightMove = 4;
+            }
+            else timeToNextRightMove--;
+        }
+        else
+            timeToNextRightMove = -1;
+    }
+
+    public void moveDown(boolean pressed) {
+        downPressed = pressed;
+        if (pressed) {
+            if (timeToNextDownMove <= 0) {
+                tetromino.tryMove(this, Direction.DOWN);
+                timeToNextDownMove = 4;
+            }
+            else timeToNextDownMove--;
+        }
+        else timeToNextDownMove = 0;
+    }
+
+    public void hardDrop() {
+        while (tetromino.tryMove(this, Direction.DOWN));
+        placeTetromino();
+    }
+
+    public void softDrop() {
+        boolean hasDropped = false;
+        while (tetromino.tryMove(this, Direction.DOWN)) hasDropped = true;
+        if (hasDropped)
+            resetTicksSinceMove();
+    }
+
+    public void moveAllLeft() {
+        tetromino.moveToEnd(this, Direction.LEFT);
+    }
+
+    public void moveAllRight() {
+        tetromino.moveToEnd(this, Direction.RIGHT);
+    }
+
+
+
+    private void initializeTetrominoes() {
 		tetromino = bag.draw();
 		next = new LinkedList<Tetromino>();
         for (int i = 0; i < PREVIEW_COUNT; i++) {
@@ -345,7 +450,7 @@ public class Board extends GuiComponent {
 	}
 	
 	@Override
-	public void tick(InputHandler input) {
+	public void tick() {
 		if (isWon()) {
 			addOldTime(timer.clone());
 			try {
@@ -361,9 +466,13 @@ public class Board extends GuiComponent {
 		if (ticksSinceMove >= TICKS_PER_MOVE) {
 			tetromino.moveDownAndPlace(this);
 		}
-		while (input.hold.next()) if (input.hold.isClicked()) hold();
-		tetromino.tick(this, input);
+
+        moveLeft(leftPressed);
+        moveRight(rightPressed);
+        moveDown(downPressed);
 	}
+
+
 
     public void setNextTetrominoesChangedListener(NextTetrominoesChangedListener nextTetrominoesChangedListener) {
         this.nextTetrominoesChangedListener = nextTetrominoesChangedListener;
@@ -371,5 +480,17 @@ public class Board extends GuiComponent {
 
     public interface NextTetrominoesChangedListener {
         public void onNextTetrominoesChanged(List<Tetromino> tetrominoes);
+    }
+
+    @Override
+    public void activate() {
+        super.activate();
+        InputHandler.getInstance().addOnToggleListener(this);
+    }
+
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        InputHandler.getInstance().removeOnToggleListener(this);
     }
 }

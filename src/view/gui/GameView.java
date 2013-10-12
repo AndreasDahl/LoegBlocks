@@ -79,7 +79,7 @@ public class GameView extends GuiComponent implements Board.NextTetrominoesChang
     }
 
     @Override
-    public void tick(InputHandler input) {
-        board.tick(input);
+    public void tick() {
+        board.tick();
     }
 }

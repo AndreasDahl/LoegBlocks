@@ -9,9 +9,11 @@ public class MainMenu extends GuiMenu {
 	
 	public MainMenu() {
 		super();
+
 		startGame = new Button(200, 100, Art.BUTTON, "New Game");
 		startGame.addButtonListener(new StartGameListener());
 		addButton(startGame, getWidth()/2-100, 100);
+
 		Button highScores = new Button(300, 100, Art.BUTTON, "Highscores");
 		highScores.addButtonListener(new HighscoreListener());
 		addButton(highScores, getWidth()/2-150, 200);
