@@ -20,19 +20,56 @@ import model.tetromino.Tetromino.Type;
 
 
 public class Board extends GuiComponent implements InputHandler.OnToggleListener {
-	public static final int LINE_WIDTH = 10;
+    /**
+     * Width of the board in blocks
+     */
+    public static final int LINE_WIDTH = 11;
+    /**
+     * Amount of lines in the board, including hidden lines
+     */
 	public static final int LINE_AMOUNT = 23;
+    /**
+     * Amount of fall moves per second
+     */
 	public static final int MOVES_PER_SECOND = 1;
+    /**
+     * Amount of ticks between fall moves
+     */
 	public static final int TICKS_PER_MOVE = GameFrame.TICKS_PER_SECOND/MOVES_PER_SECOND;
 	public static final int PLACEMENT_X = 148;
 	public static final int PLACEMENT_Y = 24;
+    /**
+     * Size of a block in pixels
+     */
 	public static final int BLOCK_SCALE = GameFrame.BLOCK_SCALE;
+    /**
+     * Width of the progress bar to the left of the board
+     */
     public static final int PROGRESS_BAR_WIDTH = 6;
-	public static final int WIDTH = LINE_WIDTH*BLOCK_SCALE + PROGRESS_BAR_WIDTH;
+    /**
+     * Amount of hidden rows in the top of the board
+     */
 	public static final int HIDDEN_ROWS = 3;
+    /**
+     * Total width of the window
+     */
+    public static final int WIDTH = LINE_WIDTH*BLOCK_SCALE + PROGRESS_BAR_WIDTH;
+    /**
+     * Total height of the window
+     */
 	public static final int HEIGHT = (LINE_AMOUNT-HIDDEN_ROWS)*BLOCK_SCALE;
+    /**
+     * Lines required to win the game
+     */
 	public static final int GOAL_LINES = 40;
+    /**
+     * Number of preview tetrominoes
+     */
     public static final int PREVIEW_COUNT = 4;
+    /**
+     * Ticks before auto repeating of moves kick in
+     */
+    public static final int AUTO_REPEAT_TICKS = 5;
 
 	
 	private TetrominoBag bag;
@@ -218,13 +255,13 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         }
     }
 
-    private void moveLeft(boolean pressed) {
+    private synchronized void moveLeft(boolean pressed) {
         leftPressed = pressed;
         if (pressed)	 {
             if (timeToNextLeftMove <= 0) {
                 tetromino.tryMove(this, Direction.LEFT);
                 if (timeToNextLeftMove < 0)	timeToNextLeftMove = 11;
-                else timeToNextLeftMove = 4;
+                else timeToNextLeftMove = AUTO_REPEAT_TICKS;
             }
             else timeToNextLeftMove--;
         }
@@ -232,13 +269,13 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
             timeToNextLeftMove = -1;
     }
 
-    public void moveRight(boolean pressed) {
+    public synchronized void moveRight(boolean pressed) {
         rightPressed = pressed;
         if (pressed) {
             if (timeToNextRightMove <= 0) {
                 tetromino.tryMove(this, Direction.RIGHT);
                 if (timeToNextRightMove < 0) timeToNextRightMove = 11;
-                else timeToNextRightMove = 4;
+                else timeToNextRightMove = AUTO_REPEAT_TICKS;
             }
             else timeToNextRightMove--;
         }
@@ -246,12 +283,12 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
             timeToNextRightMove = -1;
     }
 
-    public void moveDown(boolean pressed) {
+    public synchronized void moveDown(boolean pressed) {
         downPressed = pressed;
         if (pressed) {
             if (timeToNextDownMove <= 0) {
                 tetromino.tryMove(this, Direction.DOWN);
-                timeToNextDownMove = 4;
+                timeToNextDownMove = AUTO_REPEAT_TICKS;
             }
             else timeToNextDownMove--;
         }
