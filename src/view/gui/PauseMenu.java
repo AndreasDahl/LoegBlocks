@@ -1,53 +1,40 @@
 package view.gui;
 
+import view.Art;
 import view.GameFrame;
 import view.Screen;
-import controller.InputHandler;
 
-public class PauseMenu {
-	private int width;
-	private int height;
-	private int xPos;
-	private int yPos;
-	private Option[] options = {Option.CONTINUE, Option.OPTIONS, Option.RESTART};
-	private int selection;
-	
-	private enum Option {
-		CONTINUE, RESTART, OPTIONS
-	}
-	
-	public PauseMenu() {
-		width = 400;
-		height = 400;
-		xPos = 100;
-		yPos = 100;
-	}
-	
-	public void selectionDown() {
-		selection++;
-		if (selection >= options.length)
-			selection = 0;
-	}
-	
-	public void selectionUp() {
-		selection--;
-		if (selection < 0)
-			selection = options.length-1;
-	}
-	
-	public void performAction() {
-		if (options[selection] == Option.RESTART) {
-			//GameFrame.getInstance().getBoard().restart();
-		}
-		//GameFrame.getInstance().togglePause();
-	}
-	
-	public void tick() {
+public class PauseMenu extends GuiMenu {
+    private GameView gameView;
 
-	}
-	
-	public void render(Screen screen) {
-		screen.renderBlank(xPos, yPos, width, height, 0);
-		screen.renderBlank(xPos, yPos+100*selection, 100, 100, 0xffffff);
-	}
+    public PauseMenu(final GameView gameView, int width, int height) {
+        super(width, height);
+
+        this.gameView = gameView;
+
+        Button resume = new Button(200, 100, Art.BUTTON, "Resume");
+        resume.addButtonListener(new ButtonListener() {
+            @Override
+            public void buttonPressed() {
+                gameView.unPauseGame();
+            }
+        });
+        this.addButton(resume, 0, 0);
+
+        Button quit = new Button(200, 100, Art.BUTTON, "Quit");
+        quit.addButtonListener(new ButtonListener() {
+            @Override
+            public void buttonPressed() {
+                GameFrame.getInstance().setComponent(new MainMenu());
+            }
+        });
+        this.addButton(quit, 0, 100);
+    }
+
+    @Override
+    public void render(Screen screen) {
+        screen.renderBlank(getX(), getY(), getX()+getWidth(), getY()+getHeight(), 0xBD000000);
+
+        super.render(screen);
+    }
 }

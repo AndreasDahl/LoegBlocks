@@ -86,6 +86,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     private NextTetrominoesChangedListener nextTetrominoesChangedListener;
     private int timeToNextLeftMove = -1, timeToNextRightMove = -1, timeToNextDownMove = 0;
     private boolean leftPressed, rightPressed, downPressed;
+    private boolean paused;
 
 	//private static Board current;
 
@@ -488,25 +489,27 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	
 	@Override
 	public void tick() {
-		if (isWon()) {
-			addOldTime(timer.clone());
-			try {
-                System.out.println("WIN");
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// Do nothing
-			}
-			GameFrame.getInstance().setComponent(new MainMenu());
-		}
-		timer.newTime();
-		ticksSinceMove++;
-		if (ticksSinceMove >= TICKS_PER_MOVE) {
-			tetromino.moveDownAndPlace(this);
-		}
+        if (!paused) {
+            if (isWon()) {
+                addOldTime(timer.clone());
+                try {
+                    System.out.println("WIN");
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    // Do nothing
+                }
+                GameFrame.getInstance().setComponent(new MainMenu());
+            }
+            timer.newTime();
+            ticksSinceMove++;
+            if (ticksSinceMove >= TICKS_PER_MOVE) {
+                tetromino.moveDownAndPlace(this);
+            }
 
-        moveLeft(leftPressed);
-        moveRight(rightPressed);
-        moveDown(downPressed);
+            moveLeft(leftPressed);
+            moveRight(rightPressed);
+            moveDown(downPressed);
+        }
 	}
 
 
@@ -529,5 +532,15 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     public void deactivate() {
         super.deactivate();
         InputHandler.getInstance().removeOnToggleListener(this);
+    }
+
+    public void pause() {
+        deactivate();
+        paused = true;
+    }
+
+    public void unpause() {
+        activate();
+        paused = false;
     }
 }

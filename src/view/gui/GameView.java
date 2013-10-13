@@ -1,6 +1,7 @@
 package view.gui;
 
 import controller.InputHandler;
+import controller.Key;
 import model.Board;
 import model.Preview;
 import model.tetromino.Tetromino;
@@ -20,10 +21,12 @@ import java.util.List;
  * Time: 22:35
  * To change this template use File | Settings | File Templates.
  */
-public class GameView extends GuiComponent implements Board.NextTetrominoesChangedListener {
+public class GameView extends GuiComponent implements
+        Board.NextTetrominoesChangedListener, InputHandler.OnToggleListener {
     private Board board;
     private LinkedList<Preview> next;
     private Preview hold;
+    private PauseMenu pauseMenu;
 
     public GameView() {
         super();
@@ -80,6 +83,42 @@ public class GameView extends GuiComponent implements Board.NextTetrominoesChang
 
     @Override
     public void tick() {
-        board.tick();
+        super.tick();
+    }
+
+    public void pauseGame() {
+        board.pause();
+        pauseMenu = new PauseMenu(this, getWidth(), getHeight());
+        this.addChild(pauseMenu, 0,0);
+    }
+
+    public void unPauseGame() {
+        board.unpause();
+        if (pauseMenu != null) {
+            removeChild(pauseMenu);
+        }
+        pauseMenu = null;
+    }
+
+    @Override
+    public void activate() {
+        super.activate();
+        InputHandler.getInstance().addOnToggleListener(this);
+    }
+
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        InputHandler.getInstance().removeOnToggleListener(this);
+    }
+
+    @Override
+    public void onToggle(Key key, boolean pressed) {
+        if (key == InputHandler.getInstance().back && pressed) {
+            if (pauseMenu == null)
+                pauseGame();
+            else
+                unPauseGame();
+        }
     }
 }

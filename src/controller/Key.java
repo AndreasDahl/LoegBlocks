@@ -9,7 +9,7 @@ public class Key {
 		handler.addToKeys(this);
 	}
 
-	public void toggle(boolean pressed) {
+	public synchronized void toggle(boolean pressed) {
 		wasDown = isDown;
 		isDown = pressed;
         if (isDown && !wasDown) {

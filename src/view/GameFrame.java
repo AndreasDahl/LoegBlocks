@@ -103,8 +103,8 @@ public class GameFrame extends Canvas implements Runnable {
 	}
 	
 	private void tick() {
-		activeComponent.tick();
         InputHandler.getInstance().tick();
+		activeComponent.tick();
 	}
 	
 	public void render() {

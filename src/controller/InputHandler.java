@@ -3,19 +3,20 @@ package controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class InputHandler implements KeyListener {
     private static InputHandler instance;
 
-    private LinkedList<OnToggleListener> onToggleListeners;
+    private HashSet<OnToggleListener> onToggleListeners;
     private LinkedList<Toggle> toggles;
     private ArrayList<Key> keys = new ArrayList<Key>();
-	public Key left, right, up, down, softDrop, hardDrop, rotate, rotateCounter, rotate180, menu, hold, allLeft, allRight, enter;
+	public Key left, right, up, down, softDrop, hardDrop, rotate, rotateCounter, rotate180, menu, hold, allLeft, allRight, enter, back;
 	
 	private InputHandler() {
         toggles = new LinkedList<Toggle>();
-        onToggleListeners = new LinkedList<OnToggleListener>();
+        onToggleListeners = new HashSet<OnToggleListener>();
 
 		left = new Key(this);
 		right = new Key(this);
@@ -31,6 +32,7 @@ public class InputHandler implements KeyListener {
 		hold = new Key(this);
 		allLeft = new Key(this);
 		allRight =  new Key(this);
+        back = new Key(this);
 	}
 
     public static InputHandler getInstance() {
@@ -69,7 +71,7 @@ public class InputHandler implements KeyListener {
 		if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_NUMPAD2) down.toggle(pressed);
 		if (key == KeyEvent.VK_END || key == KeyEvent.VK_NUMPAD1 || (key == KeyEvent.VK_LEFT && e.getKeyLocation() == KeyEvent.KEY_LOCATION_STANDARD)) left.toggle(pressed);
 		if (key == KeyEvent.VK_PAGE_DOWN || key == KeyEvent.VK_NUMPAD3 || (key == KeyEvent.VK_RIGHT && e.getKeyLocation() == KeyEvent.KEY_LOCATION_STANDARD))	right.toggle(pressed);
-		if (key == KeyEvent.VK_UP)	up.toggle(pressed);
+		if (key == KeyEvent.VK_UP || key == KeyEvent.VK_NUMPAD5) up.toggle(pressed);
 		if (key == KeyEvent.VK_SPACE) hardDrop.toggle(pressed);
 		if (key == KeyEvent.VK_Z) rotateCounter.toggle(pressed);
 		if (key == KeyEvent.VK_UP || key == KeyEvent.VK_NUMPAD5 || key == 12) rotate.toggle(pressed);
@@ -80,6 +82,7 @@ public class InputHandler implements KeyListener {
 		if (key == KeyEvent.VK_X) rotate180.toggle(pressed);
 		if (key == KeyEvent.VK_ESCAPE) menu.toggle(pressed);
 		if (key == KeyEvent.VK_ENTER) enter.toggle(pressed);
+         if (key == KeyEvent.VK_ESCAPE) back.toggle(pressed);
 	}
 	
 	protected void addToKeys(Key key) {
@@ -93,7 +96,7 @@ public class InputHandler implements KeyListener {
 	}
 
     public synchronized void notifyListeners(Key key, boolean pressed) {
-        LinkedList<OnToggleListener> tmpList = (LinkedList<OnToggleListener>) onToggleListeners.clone();
+        HashSet<OnToggleListener> tmpList = (HashSet<OnToggleListener>) onToggleListeners.clone();
         for (OnToggleListener listener : tmpList) {
             listener.onToggle(key, pressed);
         }
@@ -104,7 +107,8 @@ public class InputHandler implements KeyListener {
     }
 
     public synchronized boolean removeOnToggleListener(OnToggleListener listener) {
-        return onToggleListeners.remove(listener);
+        boolean test = onToggleListeners.remove(listener);
+        return test;
     }
 
     public interface OnToggleListener {

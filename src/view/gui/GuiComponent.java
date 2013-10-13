@@ -52,32 +52,45 @@ public abstract class GuiComponent {
 		this.height = height;
 	}
 
-    public void addChild(GuiComponent child, int x, int y) {
+    public GuiComponent getParent() {
+        return this.parent;
+    }
+
+    public synchronized void addChild(GuiComponent child, int x, int y) {
         child.setX(x);
         child.setY(y);
         children.add(child);
         child.parent = this;
+        child.activate();
     }
 
-    public void tick() {
-        for (GuiComponent child : children) {
+    public synchronized boolean removeChild(GuiComponent child) {
+        boolean removed = children.remove(child);
+        if (removed)
+            child.deactivate();
+        return removed;
+    }
+
+    public synchronized void tick() {
+        ArrayList<GuiComponent> tmpList = (ArrayList<GuiComponent>) children.clone();
+        for (GuiComponent child : tmpList) {
             child.tick();
         }
     }
 
-    public void render(Screen screen) {
+    public synchronized void render(Screen screen) {
         for (GuiComponent child : children) {
             child.render(screen);
         }
     }
 
-    public void activate() {
+    public synchronized void activate() {
         for (GuiComponent child : children) {
             child.activate();
         }
     }
 
-    public void deactivate() {
+    public synchronized void deactivate() {
         for (GuiComponent child : children) {
             child.deactivate();
         }

@@ -18,8 +18,6 @@ public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListen
 	public GuiMenu(int width, int height) {
 		super(width, height);
 
-
-
 		pointer = 0;
 	}
 	
