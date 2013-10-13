@@ -19,7 +19,7 @@ public class PauseMenu extends GuiMenu {
                 gameView.unPauseGame();
             }
         });
-        this.addButton(resume, 0, 0);
+        this.addButton(resume, getWidth() / 2 - 100, 100);
 
         Button quit = new Button(200, 100, Art.BUTTON, "Quit");
         quit.addButtonListener(new ButtonListener() {
@@ -28,7 +28,7 @@ public class PauseMenu extends GuiMenu {
                 GameFrame.getInstance().setComponent(new MainMenu());
             }
         });
-        this.addButton(quit, 0, 100);
+        this.addButton(quit, getWidth() / 2 - 100, 200);
     }
 
     @Override
