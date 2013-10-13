@@ -23,7 +23,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     /**
      * Width of the board in blocks
      */
-    public static final int LINE_WIDTH = 11;
+    public static final int LINE_WIDTH = 10;
     /**
      * Amount of lines in the board, including hidden lines
      */
