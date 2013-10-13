@@ -67,11 +67,14 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
      */
     public static final int PREVIEW_COUNT = 4;
     /**
-     * Ticks before auto repeating of moves kick in
+     * Tick between auto repeats
      */
-    public static final int AUTO_REPEAT_TICKS = 5;
+    public static final int AUTO_REPEAT_TICKS = 4;
+    /**
+     * Ticks before auto repeat kicks in
+     */
+    public static final int AUTO_REPEAT_INIT_TICKS = 15;
 
-	
 	private TetrominoBag bag;
 	private Block[][] rows;
 	private Tetromino tetromino;
@@ -79,10 +82,9 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	private Preview hold;
 	private int ticksSinceMove;
 	private int linesCleared;
-	private Timer timer;
+    private OnGameOverListener gameOverListener;
+
 	private DbScoreboard scoreboard;
-	private LinkedList<Long> scores;
-	private long latestScore;
     private NextTetrominoesChangedListener nextTetrominoesChangedListener;
     private int timeToNextLeftMove = -1, timeToNextRightMove = -1, timeToNextDownMove = 0;
     private boolean leftPressed, rightPressed, downPressed;
@@ -101,10 +103,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         setWidth(WIDTH);
         setHeight(HEIGHT);
 
-		timer = new Timer();
 		scoreboard = new DbScoreboard();
-
-		newGame();
 	}
 
 	/*public static Board getCurrent() {
@@ -123,9 +122,8 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		clearBoard();
 		bag.refillGoodStart();
 		initializeTetrominoes();
-		timer.restart();
+
 		linesCleared = 0;
-		scores = scoreboard.getTop(10);
         initializePositions();
 	}
 
@@ -191,12 +189,8 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
         // Lose player if game is lost.
 		if (isLost()) {
-			try {
-                System.out.println("LOSE");
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// Do nothing
-			}
+            if (gameOverListener != null)
+			    gameOverListener.onGameOver(false);
 			GameFrame.getInstance().setComponent(new MainMenu());
 		}		
 	}
@@ -261,7 +255,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         if (pressed)	 {
             if (timeToNextLeftMove <= 0) {
                 tetromino.tryMove(this, Direction.LEFT);
-                if (timeToNextLeftMove < 0)	timeToNextLeftMove = 11;
+                if (timeToNextLeftMove < 0)	timeToNextLeftMove = AUTO_REPEAT_INIT_TICKS;
                 else timeToNextLeftMove = AUTO_REPEAT_TICKS;
             }
             else timeToNextLeftMove--;
@@ -275,7 +269,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         if (pressed) {
             if (timeToNextRightMove <= 0) {
                 tetromino.tryMove(this, Direction.RIGHT);
-                if (timeToNextRightMove < 0) timeToNextRightMove = 11;
+                if (timeToNextRightMove < 0) timeToNextRightMove = AUTO_REPEAT_INIT_TICKS;
                 else timeToNextRightMove = AUTO_REPEAT_TICKS;
             }
             else timeToNextRightMove--;
@@ -315,8 +309,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     public void moveAllRight() {
         tetromino.moveToEnd(this, Direction.RIGHT);
     }
-
-
 
     private void initializeTetrominoes() {
 		tetromino = bag.draw();
@@ -359,7 +351,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 			if (!isEmpty(point))
 				return true;
 		}
-		
 		return false;
 	}
 	
@@ -393,9 +384,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		renderTetromino(screen);
 
 		super.render(screen);
-		//renderHold(screen);
-	    renderTimer(screen);
-		renderOldTimes(screen);
 	}
 	
 	private void renderBlocks(Screen screen) {
@@ -425,17 +413,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		}
 	}
 	
-	private void renderOldTimes(Screen screen) {
-		int j = scores.size() - 1;
-		for (int i = j; i >= 0; i--) {
-			long score = scores.get(i);
-			if (score == latestScore)
-				Art.FONT.render(12, GameFrame.HEIGHT-((j-i)*12+40), Timer.longToTimeString(scores.get(i)), screen);
-			else
-				Art.FONT.render(0, GameFrame.HEIGHT-((j-i)*12+40), Timer.longToTimeString(scores.get(i)), screen);
-		}
-		
-	}
+
 
     @Override
     public int getX() {
@@ -466,16 +444,10 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		}
 	}
 	
-	private void renderTimer(Screen screen) {
-		Art.FONT.render(0, GameFrame.HEIGHT-24, timer.toString(), screen);
-	}
+
 	
 	public void resetTicksSinceMove() {
 		ticksSinceMove = 0;
-	}
-	
-	public void restart() {
-		newGame();
 	}
 	
 	public boolean isWon() {
@@ -483,24 +455,17 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	}
 	
 	private void addOldTime(Timer timer) {
-		scoreboard.add(timer.getTimePassed());
-		latestScore = timer.getTimePassed();
+
 	}
 	
 	@Override
 	public void tick() {
         if (!paused) {
             if (isWon()) {
-                addOldTime(timer.clone());
-                try {
-                    System.out.println("WIN");
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    // Do nothing
-                }
+                if (gameOverListener != null)
+                    gameOverListener.onGameOver(true);
                 GameFrame.getInstance().setComponent(new MainMenu());
             }
-            timer.newTime();
             ticksSinceMove++;
             if (ticksSinceMove >= TICKS_PER_MOVE) {
                 tetromino.moveDownAndPlace(this);
@@ -520,6 +485,10 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
     public interface NextTetrominoesChangedListener {
         public void onNextTetrominoesChanged(List<Tetromino> tetrominoes);
+    }
+
+    public interface OnGameOverListener {
+        public void onGameOver(boolean won);
     }
 
     @Override
@@ -542,5 +511,9 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     public void unpause() {
         activate();
         paused = false;
+    }
+
+    public void setGameOverListener(OnGameOverListener gameOverListener) {
+        this.gameOverListener = gameOverListener;
     }
 }

@@ -15,6 +15,7 @@ public class HighscoresMenu extends GuiMenu {
 		addButton(backButton, getWidth()/2-100, getHeight()-75);
 		
 		highscoreView = new HighscoreView(getWidth()-100, getHeight()-200);
+        highscoreView.setBackgroundColor(0xffffffff);
         addChild(highscoreView, 50, 50);
 	}
 	

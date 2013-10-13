@@ -29,12 +29,7 @@ public class PauseMenu extends GuiMenu {
             }
         });
         this.addButton(quit, getWidth() / 2 - 100, 200);
-    }
 
-    @Override
-    public void render(Screen screen) {
-        screen.renderBlank(getX(), getY(), getX()+getWidth(), getY()+getHeight(), 0xBD000000);
-
-        super.render(screen);
+        this.setBackgroundColor(0xBD000000);
     }
 }

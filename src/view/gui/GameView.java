@@ -3,7 +3,9 @@ package view.gui;
 import controller.InputHandler;
 import controller.Key;
 import model.Board;
+import model.DbScoreboard;
 import model.Preview;
+import model.Timer;
 import model.tetromino.Tetromino;
 import view.Art;
 import view.GameFrame;
@@ -22,11 +24,14 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class GameView extends GuiComponent implements
-        Board.NextTetrominoesChangedListener, InputHandler.OnToggleListener {
+        Board.NextTetrominoesChangedListener,
+        Board.OnGameOverListener,
+        InputHandler.OnToggleListener {
     private Board board;
     private LinkedList<Preview> next;
     private Preview hold;
     private PauseMenu pauseMenu;
+    private Timer timer;
 
     public GameView() {
         super();
@@ -50,6 +55,14 @@ public class GameView extends GuiComponent implements
 
         this.hold = board.getHoldPreivew();
         addChild(hold, 24, 24);
+
+        HighscoreView highscores = new HighscoreView(board.getX() - 48, 120);
+        addChild(highscores, 0, getHeight() - 36 - highscores.getHeight());
+
+        timer = new Timer();
+
+        board.newGame();
+        timer.restart();
     }
 
     @Override
@@ -61,6 +74,7 @@ public class GameView extends GuiComponent implements
 
     private void initBoard() {
         this.board = new Board();
+        board.setGameOverListener(this);
         addChild(board, Board.PLACEMENT_X, Board.PLACEMENT_Y);
 
     }
@@ -69,6 +83,7 @@ public class GameView extends GuiComponent implements
     public void render(Screen screen) {
         screen.renderBlank(0, 0, getWidth(), getHeight(), 0xffffffff);
         renderProgress(screen);
+        renderTimer(screen);
         super.render(screen);
     }
 
@@ -83,6 +98,8 @@ public class GameView extends GuiComponent implements
 
     @Override
     public void tick() {
+        timer.newTime();
+
         super.tick();
     }
 
@@ -120,5 +137,18 @@ public class GameView extends GuiComponent implements
             else
                 unPauseGame();
         }
+    }
+
+    private void renderTimer(Screen screen) {
+        Art.FONT.render(0, getHeight()-24, timer.toString(), screen);
+    }
+
+    @Override
+    public void onGameOver(boolean won) {
+        if (won) {
+            DbScoreboard scoreboard = new DbScoreboard();
+            scoreboard.add(timer.getTimePassed());
+        }
+
     }
 }

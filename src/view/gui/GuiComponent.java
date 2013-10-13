@@ -9,6 +9,7 @@ public abstract class GuiComponent {
 	private int x, y, width, height;
     private ArrayList<GuiComponent> children;
     private GuiComponent parent;
+    private int backgroundColor = 0x00000000;
 	
 	public GuiComponent(int width, int height) {
 		this.width = width;
@@ -79,6 +80,7 @@ public abstract class GuiComponent {
     }
 
     public synchronized void render(Screen screen) {
+        screen.renderBlank(getX(), getY(), getWidth(), getHeight(), backgroundColor);
         for (GuiComponent child : children) {
             child.render(screen);
         }
@@ -94,5 +96,13 @@ public abstract class GuiComponent {
         for (GuiComponent child : children) {
             child.deactivate();
         }
+    }
+
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public int getBackgroundColor() {
+        return this.backgroundColor;
     }
 }

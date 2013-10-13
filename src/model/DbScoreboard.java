@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
 
+// TODO: Run in seperate thread
 public class DbScoreboard {
 	
 	public DbScoreboard() {
@@ -18,7 +19,7 @@ public class DbScoreboard {
 		}
 	}
 	
-	//Makes sure that the nessesary table is there
+	//Makes sure that the necessary table is there
 	private void ensureStructure() {
 		Statement s = openStatement();
 		try {

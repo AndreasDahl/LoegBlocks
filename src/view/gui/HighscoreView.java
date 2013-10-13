@@ -25,8 +25,6 @@ public class HighscoreView extends GuiComponent {
 	public void render(Screen screen) {
 		super.render(screen);
 		
-		screen.renderBlank(getX(), getY(), getWidth(), getHeight(), 0xffffffff);
-		
 		int dist = getHeight()/scoresShown;
 		int i = 0;
 		for (Long score : scores) {

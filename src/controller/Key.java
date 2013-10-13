@@ -19,20 +19,6 @@ public class Key {
         }
 	}
 
-
-
-	public boolean isClicked() {
-		return !wasDown && isDown;
-	}
-
-	public boolean isPressed() {
-		return isDown;
-	}
-
-	public boolean wasReleased() {
-		return wasDown && !isDown;
-	}
-
 	public void clear() {
 		wasDown = false;
 		isDown = false;
