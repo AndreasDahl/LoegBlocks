@@ -8,7 +8,7 @@ import view.Color;
 import model.Board;
 
 public class Art {
-	public static Sprite BLOCK = loadSprite("/res/block1.png", 24, 24);
+	public static Sprite BLOCK = loadSprite("/res/loegblocken.png", 24, 24);
 	public static Sprite BLOCK_CYAN = new Sprite(BLOCK, Color.getHue(0x00ffff), 0.75);
 	public static Sprite BLOCK_BLUE = new Sprite(BLOCK, Color.getHue(0x0000ff), 0.75);
 	public static Sprite BLOCK_RED =  new Sprite(BLOCK, Color.getHue(0xff0000), 0.75);
@@ -23,8 +23,8 @@ public class Art {
 	public static Sprite GHOST = loadSprite("/res/ghost.png", 24, 24);
 	public static Sprite BG = loadSprite("/res/pretty.png", 528, 528);
 	public static Sprite START_MENU_BG = loadSprite("/res/pretty.png", 528, 528);
-	public static Font FONT = loadFont("/res/font3.png", 12, 12);	
-	
+	public static IFont FONT = loadSmartFont("/res/font5.png", 12, 32);
+
 	private static Sprite loadSprite(String path, int width, int height) {
 		try {
 			return new Sprite(ImageIO.read(GameFrame.class.getResourceAsStream(path)), width, height);
@@ -41,4 +41,13 @@ public class Art {
 			return null;
 		}
 	}
+
+    private static IFont loadSmartFont(String path, int charHeight, int asciiStart) {
+        try {
+            return new SmartFont(ImageIO.read(Board.class.getResourceAsStream(path)), charHeight, asciiStart);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

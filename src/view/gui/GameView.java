@@ -11,8 +11,6 @@ import view.Art;
 import view.GameFrame;
 import view.Screen;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +19,6 @@ import java.util.List;
  * User: Andreas
  * Date: 30-08-13
  * Time: 22:35
- * To change this template use File | Settings | File Templates.
  */
 public class GameView extends GuiComponent implements
         Board.NextTetrominoesChangedListener,
@@ -56,7 +53,8 @@ public class GameView extends GuiComponent implements
         this.hold = board.getHoldPreivew();
         addChild(hold, 24, 24);
 
-        HighscoreView highscores = new HighscoreView(board.getX() - 48, 120);
+        HighscoreView highscores = new HighscoreView(board.getX() - 48, 110);
+        highscores.setScaleText(false);
         addChild(highscores, 0, getHeight() - 36 - highscores.getHeight());
 
         timer = new Timer();

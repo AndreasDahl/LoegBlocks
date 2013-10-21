@@ -2,8 +2,8 @@ package view;
 
 import java.awt.image.BufferedImage;
 
-public class Font {
-	private static String L = 	"ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ1234567890 " +
+public class Font implements IFont {
+	private static String L = 	"ABCDEFGHIJKLMNOPQRSTUVWXYZï¿½ï¿½ï¿½1234567890 " +
 								"().,-!?%'_/&\\\"#";
 	
 	private Sprite[] sprites;
@@ -18,7 +18,8 @@ public class Font {
 			sprites[i] = new Sprite(sheet.getSubimage(i * this.charWidth % sheetWidth, (i * charWidth / sheetWidth)*charHeight, charWidth, charHeight));
 		}
 	}
-	
+
+    @Override
 	public void render(int x, int y, String text, Screen screen) {
 		text = text.toUpperCase();
 		char[] c = text.toCharArray();
@@ -27,7 +28,8 @@ public class Font {
 			screen.render(x + i * charWidth, y, sprite);
 		}
 	}
-	
+
+    @Override
 	public void render(int x, int y, int height, String text, Screen screen) {
 		text = text.toUpperCase();
 		char[] c = text.toCharArray();
@@ -36,12 +38,17 @@ public class Font {
 			screen.render(x + i * (charWidth * height / 12), y, height, height, sprite);
 		}
 	}
-	
-	public int getCharWidth() {
+
+    @Override
+    public int getStringWidth(String text) {
+        return this.charWidth * text.length();
+    }
+
+    public int getCharWidth() {
 		return charWidth;
 	}
 	
-	public int getCharHeight() {
+	public int getHeight() {
 		return charHeight;
 	}
 }

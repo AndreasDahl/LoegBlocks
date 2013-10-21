@@ -36,7 +36,7 @@ public class MainMenu extends GuiMenu {
 	@Override
 	public void render(Screen screen) {
 		screen.renderBlank(getX(), getY(), getX()+getWidth(), getY()+getHeight(), 0xff007f7f);
-		
+
 		super.render(screen);
 	}
 }
