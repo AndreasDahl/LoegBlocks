@@ -1,7 +1,5 @@
 package view;
 
-import view.Color;
-
 public class Screen {
 	private int[] pixels;	
 	private final int width;
@@ -79,6 +77,19 @@ public class Screen {
 			}
 		}
 	}
+
+    public void render(int xp, int yp, int height, int width, Sprite sprite, int color) {
+        int sw = sprite.getWidth();
+        int sh = sprite.getHeight();
+        int transparency;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                transparency = ((sprite.getPixel(x*sw/width, y*sh/height) >> 24) & 0xff);
+                if (transparency != 0x00)
+                    paintPixel((x + xp) + (y+yp) * this.width, color);
+            }
+        }
+    }
 	
 	public void renderHue(int xp, int yp, Sprite sprite, int color) {
 		int w = sprite.getWidth();

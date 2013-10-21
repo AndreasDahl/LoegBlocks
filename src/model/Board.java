@@ -191,8 +191,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		if (isLost()) {
             if (gameOverListener != null)
 			    gameOverListener.onGameOver(false);
-			GameFrame.getInstance().setComponent(new MainMenu());
-		}		
+		}
 	}
 	
 	public Block[][] getRows() {
@@ -464,7 +463,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
             if (isWon()) {
                 if (gameOverListener != null)
                     gameOverListener.onGameOver(true);
-                GameFrame.getInstance().setComponent(new MainMenu());
             }
             ticksSinceMove++;
             if (ticksSinceMove >= TICKS_PER_MOVE) {

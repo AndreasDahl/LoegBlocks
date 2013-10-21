@@ -143,10 +143,13 @@ public class GameView extends GuiComponent implements
 
     @Override
     public void onGameOver(boolean won) {
+        MainMenu mainMenu = new MainMenu();
         if (won) {
             DbScoreboard scoreboard = new DbScoreboard();
-            scoreboard.add(timer.getTimePassed());
+            long score = timer.getTimePassed();
+            scoreboard.add(score);
+            mainMenu.setScoreText(Timer.longToTimeString(score));
         }
-
+        GameFrame.getInstance().setComponent(mainMenu);
     }
 }

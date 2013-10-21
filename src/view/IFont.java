@@ -9,7 +9,9 @@ package view;
 public interface IFont {
     public void render(int x, int y, String text, Screen screen);
     public void render(int x, int y, int height, String text, Screen screen);
+    public void render(int x, int y, int height, String text, int color, Screen screen);
 
     public int getStringWidth(String text);
+    public int getStringWidth(String text, int height);
     public int getHeight();
 }

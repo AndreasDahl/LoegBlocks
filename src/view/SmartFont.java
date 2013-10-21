@@ -9,7 +9,7 @@ public class SmartFont implements IFont {
 	private ArrayList<Sprite> sprites;
     private int charHeight;
     private int asciiInit;
-    private int spacing = 5;
+    private int spacing = 3;
 
 	public SmartFont(BufferedImage sheet, int charHeight, int asciiInit) {
 		this.charHeight = charHeight;
@@ -52,6 +52,18 @@ public class SmartFont implements IFont {
 	}
 
     @Override
+    public void render(int x, int y, int height, String text, int color, Screen screen) {
+        text = text.toUpperCase();
+        float scale = height / charHeight;
+        char[] c = text.toCharArray();
+        for (int i = 0; i < c.length; i++) {
+            Sprite sprite = getSprite(c[i]);
+            screen.render(x, y, height, (int)(sprite.getWidth() * scale), sprite, color);
+            x += (sprite.getWidth() + spacing) * scale;
+        }
+    }
+
+    @Override
     public int getStringWidth(String text) {
         int sum = 0;
         text = text.toUpperCase();
@@ -59,7 +71,24 @@ public class SmartFont implements IFont {
         for (char c : chars) {
             sum += getSprite(c).getWidth() + spacing;
         }
-        return sum;
+        return sum - spacing;
+    }
+
+    @Override
+    public int getStringWidth(String text, int height) {
+        float scale = (float)height / getHeight();
+        int sum = 0;
+        text = text.toUpperCase();
+        char[] chars = text.toCharArray();
+        for (char c : chars) {
+            sum += (getSprite(c).getWidth() + spacing) * scale;
+        }
+        return sum - (int)(spacing * scale);
+    }
+
+    @Override
+    public int getHeight() {
+        return charHeight;
     }
 
     private Sprite getSprite(char ascii) {
@@ -70,7 +99,5 @@ public class SmartFont implements IFont {
 		return getSprite(character).getWidth();
 	}
 	
-	public int getHeight() {
-		return charHeight;
-	}
+
 }

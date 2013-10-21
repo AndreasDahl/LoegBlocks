@@ -37,6 +37,22 @@ public abstract class GuiComponent {
 		this.y = y;
 	}
 
+    public int getLeft() {
+        return this.x;
+    }
+
+    public int getTop() {
+        return this.y;
+    }
+
+    public int getRight() {
+        return this.x + getWidth();
+    }
+
+    public int getBottom() {
+        return this.y + getHeight();
+    }
+
 	public int getWidth() {
 		return width;
 	}

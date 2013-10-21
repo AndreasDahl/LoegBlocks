@@ -16,7 +16,7 @@ import view.gui.MainMenu;
 public class GameFrame extends Canvas implements Runnable {
 	private static final long serialVersionUID = 5761980091712249788L;
 
-	public static final String TITLE = "TETRIS";
+	public static final String TITLE = "Loeg Blocks";
 	public static final int BLOCK_SCALE = 24;
 	public static final int TICKS_PER_SECOND = 60;
 	public static final int WIDTH = 528;

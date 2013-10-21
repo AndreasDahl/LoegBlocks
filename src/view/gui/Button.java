@@ -62,7 +62,7 @@ public class Button extends GuiComponent {
 		screen.render(getX(), getY(), getHeight(), getWidth(), sprite);
 		if (text != null) {
 			int textLength = text.length();
-			Art.FONT.render(getX()+(getWidth()-Art.FONT.getStringWidth(text))/2, getY()+(getHeight())/2, text, screen);
+			Art.FONT.render(getX()+(getWidth()-Art.FONT.getStringWidth(text))/2, getY()+(getHeight())/2 - (Art.FONT.getHeight()/2), text, screen);
 		}
 		
 		// Render highlight if hovered
