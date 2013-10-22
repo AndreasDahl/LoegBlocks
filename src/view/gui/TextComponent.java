@@ -3,6 +3,7 @@ package view.gui;
 import view.Art;
 import view.IFont;
 import view.Screen;
+import view.SmartFont;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +38,7 @@ public class TextComponent extends GuiComponent {
     private void  init(String text) {
         this.textColor = 0xff000000;
         this.text = text;
-        this.font = Art.FONT;
+        this.font = new SmartFont((SmartFont)Art.FONT, getHeight());
         updateWidth();
     }
 

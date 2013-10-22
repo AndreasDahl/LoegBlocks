@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -28,7 +29,20 @@ public class SmartFont implements IFont {
             }
         }
 	}
-	 @Override
+
+    public SmartFont(SmartFont otherFont, int height) {
+        this.charHeight = height;
+        this.asciiInit = otherFont.asciiInit;
+        this.sprites = new ArrayList<Sprite>();
+
+        float scale = height / otherFont.getHeight();
+
+        for (Sprite sprite : otherFont.sprites) {
+            this.sprites.add(new Sprite(sprite.getImage(), Math.round(sprite.getWidth() * scale), height));
+        }
+    }
+
+	@Override
 	public void render(int x, int y, String text, Screen screen) {
 		text = text.toUpperCase();
 		char[] c = text.toCharArray();
@@ -98,6 +112,4 @@ public class SmartFont implements IFont {
     public int getCharWidth(char character) {
 		return getSprite(character).getWidth();
 	}
-	
-
 }
