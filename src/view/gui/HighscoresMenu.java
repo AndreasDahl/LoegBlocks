@@ -10,6 +10,9 @@ public class HighscoresMenu extends GuiMenu {
 	
 	public HighscoresMenu() {
 		super();
+
+        this.setBackgroundColor(Art.BACKGROUND);
+
 		backButton = new Button(200, 50, Art.BUTTON, "Back");
 		backButton.addButtonListener(new BackListener());
 		addButton(backButton, getWidth()/2-backButton.getWidth()/2, getHeight()-backButton.getHeight()-10);
@@ -24,14 +27,5 @@ public class HighscoresMenu extends GuiMenu {
 		public void buttonPressed() {
 			GameFrame.getInstance().setComponent(new MainMenu());
 		}
-	}
-	
-	@Override
-	public void render(Screen screen) {
-		screen.renderBlank(getX(), getY(), getX()+getWidth(), getY()+getHeight(), 0xff007f7f);
-		
-		highscoreView.render(screen);
-		
-		super.render(screen);
 	}
 }

@@ -9,7 +9,7 @@ public class OptionsMenu extends GuiMenu {
 	public OptionsMenu() {
 		super();
 
-        setBackgroundColor(0xff000030);
+        setBackgroundColor(Art.BACKGROUND);
 
         Button backButton = new Button(200, 50, Art.BUTTON, "back");
         backButton.addButtonListener(new BackPressedListener());

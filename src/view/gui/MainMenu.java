@@ -11,7 +11,7 @@ public class MainMenu extends GuiMenu {
 	public MainMenu() {
 		super();
 
-        this.setBackgroundColor(0xff000030);
+        this.setBackgroundColor(Art.BACKGROUND);
 
         // start game button
 		startGame = new Button(200, 48, Art.BUTTON, "New Game");

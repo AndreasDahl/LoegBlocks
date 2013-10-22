@@ -6,6 +6,10 @@ import javax.imageio.ImageIO;
 import model.Board;
 
 public class Art {
+    // Colors
+    public static int BACKGROUND = 0xff000030;
+
+    // Default Sprites
 	public static Sprite BLOCK = loadSprite("/res/blocks/loegblocken.png", 24, 24);
 	public static Sprite BLOCK_CYAN = new Sprite(BLOCK, Color.getHue(0x00ffff), 0.75);
 	public static Sprite BLOCK_BLUE = new Sprite(BLOCK, Color.getHue(0x0000ff), 0.75);
