@@ -12,6 +12,8 @@ public class JBlock extends Tetromino {
 	
 	@Override
 	public void initializePositions() {
+        super.initializePositions();
+
 		Point[] relative = new Point[3];
 		relative[0] = new Point(1, 0);
 		relative[1] = new Point(-1, 0);

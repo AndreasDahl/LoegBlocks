@@ -37,7 +37,9 @@ public abstract class Tetromino {
         initializePositions();
 	}
 
-    public abstract void initializePositions();
+    public void initializePositions() {
+        rotation = 0;
+    }
 	
 	public abstract Type getType();
 	
@@ -201,6 +203,7 @@ public abstract class Tetromino {
         if (rotateAlgorithm(board, base, newRel, getKicks()[rotation])) {
             addRotation(1);
         }
+        System.out.print("Rotate " + this.toString() + "\n");
     }
 
     public void rotateCounterClockwise(Board board) {

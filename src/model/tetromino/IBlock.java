@@ -23,6 +23,8 @@ public class IBlock extends Tetromino {
 	
 	@Override
 	public void initializePositions() {
+        super.initializePositions();
+
 		Point[] relative = new Point[3];
 		relative[0] = new Point(-1, 0);
 		relative[1] = new Point(1, 0);
@@ -47,6 +49,7 @@ public class IBlock extends Tetromino {
 		int rot = (getRotation()+1) % 4;
 		if (rotateAlgorithm(board, Point.translate(getBase(), BASES[rot]), RELS[rot], getKicks()[getRotation()]))
 			addRotation(1);
+        System.out.print("Rotate " + this.toString() + "\n");
 	}
 	
 	@Override
