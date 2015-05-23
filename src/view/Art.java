@@ -22,7 +22,7 @@ public class Art {
 	public static Sprite BUTTON = loadSprite("/res/button2.png", 100, 50);
 
 	public static Sprite GHOST = loadSprite("/res/ghost.png", 24, 24);
-	public static IFont FONT = loadSmartFont("/res/font5.png", 12, 32);
+	public static IFont FONT = loadFont("/res/font4.png", 12, 12);
 
 	private static Sprite loadSprite(String path, int width, int height) {
 		try {
