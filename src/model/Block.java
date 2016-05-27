@@ -2,10 +2,10 @@ package model;
 
 import model.tetromino.Tetromino.Type;
 
-public class Block {
+class Block {
 	private Type type;
 	
-	public Block(Type type) {
+	Block(Type type) {
 		this.type = type;
 	}
 

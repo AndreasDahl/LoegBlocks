@@ -61,7 +61,7 @@ public class DbScoreboard {
 	
 	public LinkedList<Long> getTop(int n) {
 		Statement s = openStatement();
-		LinkedList<Long> result = new LinkedList<Long>();
+		LinkedList<Long> result = new LinkedList<>();
 		try {
 			ResultSet rs = s.executeQuery(	"SELECT * " + 
 					"FROM scores " +
@@ -74,7 +74,7 @@ public class DbScoreboard {
 			return result;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return new LinkedList<Long>();
+			return new LinkedList<>();
 		}
 		finally {
 			closeStatement(s);
@@ -84,10 +84,10 @@ public class DbScoreboard {
 	public LinkedList<Long> loadAllScores() {
 		Statement s = openStatement();
 		ResultSet rs;
-		LinkedList<Long> result = new LinkedList<Long>();
+		LinkedList<Long> result = new LinkedList<>();
 		try {
 		    rs = s.executeQuery("SELECT time FROM scores");
-			result = new LinkedList<Long>();
+			result = new LinkedList<>();
 		    while (rs.next()) {
 		    	result.add(rs.getLong("time"));
 		    }

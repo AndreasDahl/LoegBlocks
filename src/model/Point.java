@@ -49,10 +49,12 @@ public class Point {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj.getClass() != this.getClass())
+		}
+		if (obj.getClass() != this.getClass()) {
 			return false;
+		}
 		Point test = (Point)obj;
 		return x == test.x && y == test.y;
 	}
@@ -72,6 +74,7 @@ public class Point {
 	 * @param  otherPoint  Coordinates of the point to translate by
 	 * @return  this point. After translation
 	 */
+	@SuppressWarnings("unused")
 	public Point translate(Point otherPoint) {
 		return translate(otherPoint.getX(), otherPoint.getY());
 	}

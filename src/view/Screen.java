@@ -1,7 +1,7 @@
 package view;
 
 public class Screen {
-	private int[] pixels;	
+	private final int[] pixels;
 	private final int width;
 	
 	public Screen(int[] pixels, int width) {

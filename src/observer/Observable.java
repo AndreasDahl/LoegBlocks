@@ -6,7 +6,7 @@ public abstract class Observable {
 	private ArrayList<IObserver> observers;
 	
 	public Observable() {
-		observers = new ArrayList<IObserver>();
+		observers = new ArrayList<>();
 	}
 	
 	public void addObserver(IObserver observer) {

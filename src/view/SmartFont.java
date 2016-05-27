@@ -1,21 +1,20 @@
 package view;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class SmartFont implements IFont {
-    private static int ID_COLOR = 0xffff0000;
+    private static final int ID_COLOR = 0xffff0000;
 
-	private ArrayList<Sprite> sprites;
-    private int charHeight;
-    private int asciiInit;
-    private int spacing = 3;
+	private final ArrayList<Sprite> sprites;
+    private final int charHeight;
+    private final int asciiInit;
+    private final int spacing = 3;
 
 	public SmartFont(BufferedImage sheet, int charHeight, int asciiInit) {
 		this.charHeight = charHeight;
         this.asciiInit = asciiInit;
-		this.sprites = new ArrayList<Sprite>();
+		this.sprites = new ArrayList<>();
 
         for (int y = 0 ; y < sheet.getHeight() - charHeight; y += charHeight) {
             int left = -1;
@@ -33,7 +32,7 @@ public class SmartFont implements IFont {
     public SmartFont(SmartFont otherFont, int height) {
         this.charHeight = height;
         this.asciiInit = otherFont.asciiInit;
-        this.sprites = new ArrayList<Sprite>();
+        this.sprites = new ArrayList<>();
 
         float scale = height / otherFont.getHeight();
 
@@ -45,12 +44,12 @@ public class SmartFont implements IFont {
 	@Override
 	public void render(int x, int y, String text, Screen screen) {
 		text = text.toUpperCase();
-		char[] c = text.toCharArray();
-		for (int i = 0; i < c.length; i++) {
-			Sprite sprite = getSprite(c[i]);
-			screen.render(x, y, sprite);
+		char[] chars = text.toCharArray();
+        for (char character : chars) {
+            Sprite sprite = getSprite(character);
+            screen.render(x, y, sprite);
             x += sprite.getWidth() + spacing;
-		}
+        }
 	}
 
     @Override

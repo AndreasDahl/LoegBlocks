@@ -14,7 +14,7 @@ public class Timer implements Cloneable {
 		restart();
 	}
 	
-	public Timer(Timer other) {
+	private Timer(Timer other) {
 		timePassed = other.timePassed;
 		currentTime = other.currentTime;
 		h = other.h;
@@ -53,7 +53,7 @@ public class Timer implements Cloneable {
 		return leftPad(Integer.toString(m+60*h), 2) + "." + leftPad(Integer.toString(s), 2) + "." + leftPad(Long.toString(ns/1000000), 3);
 	}
 	
-	public void restart() {
+	public final void restart() {
 		timePassed = 0;
 		h = 0;
 		m = 0;

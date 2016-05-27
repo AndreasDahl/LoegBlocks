@@ -9,7 +9,7 @@ import view.Sprite;
 
 public class Button extends GuiComponent {
 
-	private List<ButtonListener> listeners = new ArrayList<ButtonListener>();	
+	private List<ButtonListener> listeners = new ArrayList<>();
 	
 	private Sprite sprite;
 	private boolean isPressed = false;

@@ -2,13 +2,12 @@ package view.gui;
 
 import view.Art;
 import view.GameFrame;
-import view.Screen;
 
-public class HighscoresMenu extends GuiMenu {
-	private Button backButton;
-	private HighscoreView highscoreView;
+class HighscoresMenu extends GuiMenu {
+	private final Button backButton;
+	private final HighscoreView highscoreView;
 	
-	public HighscoresMenu() {
+	HighscoresMenu() {
 		super();
 
         this.setBackgroundColor(Art.BACKGROUND);

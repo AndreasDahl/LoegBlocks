@@ -1,18 +1,18 @@
 package view.gui;
 
-import java.util.LinkedList;
-
 import model.DbScoreboard;
 import model.Timer;
 import view.Art;
 import view.Screen;
 
-public class HighscoreView extends GuiComponent {
+import java.util.LinkedList;
+
+class HighscoreView extends GuiComponent {
 	private int scoresShown = 10;
 	private LinkedList<Long> scores;
     private boolean scaleText;
 	
-	public HighscoreView(int width, int height) {
+	HighscoreView(int width, int height) {
 		super(width, height);
 
         scaleText = true;
@@ -20,11 +20,11 @@ public class HighscoreView extends GuiComponent {
 		refresh();
 	}
 	
-	public void refresh() {
+	private void refresh() {
 		scores = new DbScoreboard().getTop(scoresShown);
 	}
 
-    public void setScaleText(boolean scaleText) {
+    void setScaleText(boolean scaleText) {
         this.scaleText = scaleText;
     }
 	

@@ -1,6 +1,6 @@
 package view.gui;
 
-public interface ButtonListener {
+interface ButtonListener {
 	
-	public void buttonPressed();
+	void buttonPressed();
 }

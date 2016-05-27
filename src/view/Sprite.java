@@ -3,12 +3,10 @@ package view;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import view.Color;
-
 public class Sprite {
     private BufferedImage image;
-	private int width, height;
-	private int[] pixels;
+	private final int width, height;
+	private final int[] pixels;
 	
 	public Sprite(BufferedImage image) {
 		width = image.getWidth();

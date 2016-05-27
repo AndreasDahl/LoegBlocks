@@ -24,22 +24,24 @@ public class Preview extends GuiComponent {
 		return tetromino;
 	}
 	
-	public void render(Screen screen) {
+	@Override
+    public void render(Screen screen) {
 		screen.renderBlank(getX(), getY(), 96, 96, 0xff000000);
 		
 		if (tetromino != null) {
-            if (enabled)
-			    tetromino.renderStatic(screen, 1*GameFrame.BLOCK_SCALE + getX(), 1 * GameFrame.BLOCK_SCALE + getY());
-            else
-                tetromino.renderStatic(screen, 1*GameFrame.BLOCK_SCALE + getX(), 1 * GameFrame.BLOCK_SCALE + getY(), Art.BLOCK);
+            if (enabled) {
+                tetromino.renderStatic(screen, GameFrame.BLOCK_SCALE + getX(), GameFrame.BLOCK_SCALE + getY());
+            } else {
+                tetromino.renderStatic(screen, GameFrame.BLOCK_SCALE + getX(), GameFrame.BLOCK_SCALE + getY(), Art.BLOCK);
+            }
 		}
 	}
 
-    public void setEnabled(boolean enabled) {
+    void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isEnabled() {
+    boolean isEnabled() {
         return this.enabled;
     }
 }

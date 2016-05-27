@@ -32,7 +32,7 @@ public class GameView extends GuiComponent implements
 
     public GameView() {
         super();
-        next = new LinkedList<Preview>();
+        next = new LinkedList<>();
         initBoard();
 
         Preview preview = new Preview();

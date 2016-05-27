@@ -1,15 +1,15 @@
 package controller;
 
 public class Key {
-	public boolean wasDown;
-	public boolean isDown;
+	private boolean wasDown;
+	private boolean isDown;
 
-	public Key(InputHandler handler) {
+	Key(InputHandler handler) {
 		clear();
 		handler.addToKeys(this);
 	}
 
-	public synchronized void toggle(boolean pressed) {
+	synchronized void toggle(boolean pressed) {
 		wasDown = isDown;
 		isDown = pressed;
         if (isDown && !wasDown) {
@@ -19,7 +19,7 @@ public class Key {
         }
 	}
 
-	public void clear() {
+	void clear() {
 		wasDown = false;
 		isDown = false;
 	}

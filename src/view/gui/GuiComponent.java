@@ -14,7 +14,7 @@ public abstract class GuiComponent {
 	public GuiComponent(int width, int height) {
 		this.width = width;
 		this.height = height;
-        this.children = new ArrayList<GuiComponent>();
+        this.children = new ArrayList<>();
 	}
 	
 	public GuiComponent() {
@@ -103,15 +103,11 @@ public abstract class GuiComponent {
     }
 
     public synchronized void activate() {
-        for (GuiComponent child : children) {
-            child.activate();
-        }
+        children.forEach(GuiComponent::activate);
     }
 
     public synchronized void deactivate() {
-        for (GuiComponent child : children) {
-            child.deactivate();
-        }
+        children.forEach(GuiComponent::deactivate);
     }
 
     public void setBackgroundColor(int backgroundColor) {

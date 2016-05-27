@@ -2,14 +2,14 @@ package view;
 
 import java.awt.image.BufferedImage;
 
-public class Font implements IFont {
+class Font implements IFont {
 	private static String L = 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ���1234567890 " +
 								"().,-!?%'_/&\\\"#";
 	
-	private Sprite[] sprites;
-	private int charWidth, charHeight;
+	private final Sprite[] sprites;
+	private final int charWidth, charHeight;
 	
-	public Font(BufferedImage sheet, int charWidth, int charHeight) {
+	Font(BufferedImage sheet, int charWidth, int charHeight) {
 		this.charWidth = charWidth;
 		this.charHeight = charHeight;
 		sprites = new Sprite[L.length()];

@@ -3,10 +3,10 @@ package model.tetromino;
 import model.Board;
 import model.Point;
 
-public class OBlock extends Tetromino {
-	public static final int COLOR = 0xbfffff00;
+class OBlock extends Tetromino {
+	private static final int COLOR = 0xbfffff00;
 	
-	public OBlock() {
+	OBlock() {
 		super(COLOR);
 	}
 	

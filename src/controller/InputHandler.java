@@ -3,20 +3,21 @@ package controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 public class InputHandler implements KeyListener {
     private static InputHandler instance;
 
-    private HashSet<OnToggleListener> onToggleListeners;
-    private LinkedList<Toggle> toggles;
-    private ArrayList<Key> keys = new ArrayList<Key>();
-	public Key left, right, up, down, softDrop, hardDrop, rotate, rotateCounter, rotate180, menu, hold, allLeft, allRight, enter, back;
+    private final HashSet<OnToggleListener> onToggleListeners;
+    private final Deque<Toggle> toggles;
+    private final ArrayList<Key> keys = new ArrayList<>();
+	public final Key left, right, up, down, softDrop, hardDrop, rotate, rotateCounter, rotate180, menu, hold, allLeft, allRight, enter, back;
 	
 	private InputHandler() {
-        toggles = new LinkedList<Toggle>();
-        onToggleListeners = new HashSet<OnToggleListener>();
+        toggles = new LinkedList<>();
+        onToggleListeners = new HashSet<>();
 
 		left = new Key(this);
 		right = new Key(this);
@@ -36,8 +37,9 @@ public class InputHandler implements KeyListener {
 	}
 
     public static InputHandler getInstance() {
-        if (instance == null)
-            instance = new InputHandler();
+        if (instance == null) {
+			instance = new InputHandler();
+		}
         return instance;
     }
 
@@ -82,10 +84,10 @@ public class InputHandler implements KeyListener {
 		if (key == KeyEvent.VK_X) rotate180.toggle(pressed);
 		if (key == KeyEvent.VK_ESCAPE) menu.toggle(pressed);
 		if (key == KeyEvent.VK_ENTER) enter.toggle(pressed);
-         if (key == KeyEvent.VK_ESCAPE) back.toggle(pressed);
+		if (key == KeyEvent.VK_ESCAPE) back.toggle(pressed);
 	}
 	
-	protected void addToKeys(Key key) {
+	void addToKeys(Key key) {
 		keys.add(key);
 	}
 
@@ -95,7 +97,7 @@ public class InputHandler implements KeyListener {
 		}
 	}
 
-    public synchronized void notifyListeners(Key key, boolean pressed) {
+    synchronized void notifyListeners(Key key, boolean pressed) {
         HashSet<OnToggleListener> tmpList = (HashSet<OnToggleListener>) onToggleListeners.clone();
         for (OnToggleListener listener : tmpList) {
             listener.onToggle(key, pressed);
@@ -112,12 +114,12 @@ public class InputHandler implements KeyListener {
     }
 
     public interface OnToggleListener {
-        public void onToggle(Key key, boolean pressed);
+        void onToggle(Key key, boolean pressed);
     }
 
     private class Toggle {
-        public KeyEvent keyEvent;
-        public boolean down;
+        KeyEvent keyEvent;
+        boolean down;
 
         Toggle(KeyEvent keyEvent, boolean down) {
             this.keyEvent = keyEvent;

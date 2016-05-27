@@ -1,17 +1,15 @@
 package view;
 
+import controller.InputHandler;
 import view.gui.GameView;
 import view.gui.GuiComponent;
-import java.awt.Canvas;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import view.gui.MainMenu;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import javax.swing.JFrame;
-
-import controller.InputHandler;
-import view.gui.MainMenu;
 
 public class GameFrame extends Canvas implements Runnable {
 	private static final long serialVersionUID = 5761980091712249788L;
@@ -25,8 +23,8 @@ public class GameFrame extends Canvas implements Runnable {
 	private static JFrame frame;
 	private static GameFrame instance;
 
-	private BufferedImage image;
-	private int[] pixels;
+	private final BufferedImage image;
+	private final int[] pixels;
 	private boolean running;
 	private Screen screen;
 	private GuiComponent activeComponent;
@@ -39,12 +37,13 @@ public class GameFrame extends Canvas implements Runnable {
 	}
 	
 	public static GameFrame getInstance() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new GameFrame();
+		}
 		return instance;
 	}
 	
-	public void start() {
+	private void start() {
 		running = true;
 		setComponent(new MainMenu());
 		new Thread(this).start();
@@ -54,7 +53,7 @@ public class GameFrame extends Canvas implements Runnable {
 		running = false;
 	}
 	
-	public void init() {
+	private void init() {
 		screen = new Screen(pixels, WIDTH);
 	}
 	
@@ -87,12 +86,12 @@ public class GameFrame extends Canvas implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
-			
+
 			if (shouldRender) {
 				frames++;
 				render();
 			}
-			
+
 			if (System.currentTimeMillis() - lastTimer1 > 1000) {
 				lastTimer1 += 1000;
 		 		System.out.println(ticks + " ticks, " + frames + " fps");
@@ -130,8 +129,9 @@ public class GameFrame extends Canvas implements Runnable {
 	
 	public void setComponent(GuiComponent component) {
 		InputHandler.getInstance().clearAll();
-        if (activeComponent != null)
-            activeComponent.deactivate();
+        if (activeComponent != null) {
+			activeComponent.deactivate();
+		}
         component.activate();
 		activeComponent = component;
 	}
@@ -144,7 +144,7 @@ public class GameFrame extends Canvas implements Runnable {
  	
 	public static void main(String[] args) {
 		frame = new JFrame(TITLE);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		
 		GameFrame game = GameFrame.getInstance();

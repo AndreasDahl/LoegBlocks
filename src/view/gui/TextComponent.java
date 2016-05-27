@@ -8,13 +8,13 @@ import view.*;
  * Date: 22-10-13
  * Time: 00:06
  */
-public class TextComponent extends GuiComponent {
+class TextComponent extends GuiComponent {
     private String text;
     private int textColor;
     private IFont font;
 
 
-    public TextComponent(String text, int height) {
+    TextComponent(String text, int height) {
         super(0, height);
         init(text);
     }
@@ -24,7 +24,7 @@ public class TextComponent extends GuiComponent {
         init(text);
     }
 
-    public void setTextColor(int newColor) {
+    void setTextColor(int newColor) {
         this.textColor = newColor;
     }
 

@@ -4,7 +4,6 @@ public class Color {
 
 	/**
 	 * Returns the lightness of a color in a scale from 0 to 254
-	 * @param color
 	 * @return  lightness value of the color
 	 */
 	public static double[] getLightnessAndSaturation(int color) {

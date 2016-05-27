@@ -1,31 +1,28 @@
 package model.tetromino;
 
-import controller.InputHandler;
-import controller.Key;
+import model.Board;
+import model.Direction;
+import model.Point;
 import view.Art;
 import view.GameFrame;
 import view.Screen;
 import view.Sprite;
 
-import model.Board;
-import model.Direction;
-import model.Point;
-
 /**
  * Controllable collection of four blocks
  * @author Andreas
  */
-public abstract class Tetromino {	
+public abstract class Tetromino {
 	private Point base;
 	private Point[] rel;
-	private int color;
+	private final int color;
 	private int rotation; // 0 = no, 1 = r, 2 = 180, 3 = l;
 
 	
-	protected static Point[][] KICKS = {{new Point(-1,0), new Point(-1,-1), new Point(0,2), new Point(-1,2)},
-										{new Point(1,0), new Point(1,1), new Point(0,-2), new Point(1,-2)},
-										{new Point(1,0), new Point(1,-1), new Point(0,2), new Point(-1,-2)},
-										{new Point(-1,0), new Point(-1,1), new Point(0,-2), new Point(-1,-2)}};
+	private static final Point[][] KICKS = {{new Point(-1,0), new Point(-1,-1), new Point(0,2), new Point(-1,2)},
+										    {new Point(1,0), new Point(1,1), new Point(0,-2), new Point(1,-2)},
+										    {new Point(1,0), new Point(1,-1), new Point(0,2), new Point(-1,-2)},
+										    {new Point(-1,0), new Point(-1,1), new Point(0,-2), new Point(-1,-2)}};
 	
 	public enum Type {
 		I, O, T, Z, S, L, J;
@@ -111,19 +108,21 @@ public abstract class Tetromino {
 	public boolean tryMove(Board board, Direction direction) {
 		if (canMove(board, direction)) {
 			this.base = base.getNeighbour(direction);
-			if (direction == Direction.DOWN && board.getTetromino() == this)
-				board.resetTicksSinceMove();
+			if (direction == Direction.DOWN && board.getTetromino() == this) {
+                board.resetTicksSinceMove();
+            }
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean canMove(Board board, Direction direction) {
+	private boolean canMove(Board board, Direction direction) {
 		Point[] selection = getSelection();
 
 		for (Point point : selection) {
-			if (!board.isEmpty(point.getNeighbour(direction)))
-				return false;
+			if (!board.isEmpty(point.getNeighbour(direction))) {
+                return false;
+            }
 		}
 		return true;
 	}
@@ -163,17 +162,16 @@ public abstract class Tetromino {
 				t.setBase(this.base);
 				t.setRel(this.rel);
 			}
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		return t;
+        return t;
 	}
 
 	public void moveDownAndPlace(Board board) {
-		if (!tryMove(board, Direction.DOWN))
-			board.placeTetromino();
+		if (!tryMove(board, Direction.DOWN)) {
+            board.placeTetromino();
+        }
 	}
 	
 
@@ -188,7 +186,6 @@ public abstract class Tetromino {
 	 * rotation.</p>
 	 * <p>The rotation will wrap around from 3 to 0 as there are only 4 possible
 	 * rotations of a tetromino.
-	 * @param n
 	 */
 	protected void addRotation(int n) {
 		rotation += n;
@@ -238,9 +235,8 @@ public abstract class Tetromino {
 	 * 					if a kick occurs
 	 * @param newRel	The new relative positions.
 	 * @param kickList	The list of possible kicks
-	 * @return
 	 */
-	protected boolean rotateAlgorithm(Board board, Point base, Point[] newRel, Point[] kickList) {
+    boolean rotateAlgorithm(Board board, Point base, Point[] newRel, Point[] kickList) {
 		Point[] tmp = kickList;
 		kickList = new Point[kickList.length+1];
 		kickList[0] = new Point(0,0);
@@ -271,15 +267,15 @@ public abstract class Tetromino {
 		return selection;
 	}
 	
-	protected void setRel(Point[] rel) {
+	void setRel(Point[] rel) {
 		this.rel = rel;
 	}
 	
-	protected void setBase(Point point) {
+	void setBase(Point point) {
 		this.base = point;
 	}
 	
-	public Point getBase() {
+	Point getBase() {
 		return base;
 	}
 	

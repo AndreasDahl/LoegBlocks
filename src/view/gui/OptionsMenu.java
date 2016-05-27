@@ -2,11 +2,10 @@ package view.gui;
 
 import view.Art;
 import view.GameFrame;
-import view.Screen;
 
-public class OptionsMenu extends GuiMenu {
+class OptionsMenu extends GuiMenu {
 
-	public OptionsMenu() {
+	OptionsMenu() {
 		super();
 
         setBackgroundColor(Art.BACKGROUND);

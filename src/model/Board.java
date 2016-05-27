@@ -1,22 +1,15 @@
 package model;
 
-import controller.Key;
-import view.gui.GuiComponent;
-import view.gui.MainMenu;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import controller.InputHandler;
-
-import view.Art;
-
-import view.GameFrame;
-import view.Screen;
+import controller.Key;
 import model.tetromino.Tetromino;
 import model.tetromino.Tetromino.Type;
+import view.Art;
+import view.GameFrame;
+import view.Screen;
+import view.gui.GuiComponent;
+
+import java.util.*;
 
 
 public class Board extends GuiComponent implements InputHandler.OnToggleListener {
@@ -75,11 +68,11 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
      */
     public static final int AUTO_REPEAT_INIT_TICKS = 15;
 
-	private TetrominoBag bag;
+	private final TetrominoBag bag;
 	private Block[][] rows;
 	private Tetromino tetromino;
-	private LinkedList<Tetromino> next = new LinkedList<Tetromino>();
-	private Preview hold;
+	private LinkedList<Tetromino> next = new LinkedList<>();
+	private final Preview hold;
 	private int ticksSinceMove;
 	private int linesCleared;
     private OnGameOverListener gameOverListener;
@@ -97,7 +90,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
    	public Board() {
    		super();
 		bag = new TetrominoBag();
-        next = new LinkedList<Tetromino>();
+        next = new LinkedList<>();
         hold = new Preview();
 
         setWidth(WIDTH);
@@ -114,7 +107,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
 
 
-	public void addBlock(Point position, Type type) {
+	private void addBlock(Point position, Type type) {
 		rows[position.getY()][position.getX()] = new Block(type);
 	}
 	
@@ -136,7 +129,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	
 	private void clearBoard() {
 		rows = new Block[LINE_AMOUNT][LINE_WIDTH];
-		next = new LinkedList<Tetromino>();
+		next = new LinkedList<>();
         hold.setTetromino(null);
 	}
 
@@ -311,7 +304,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
     private void initializeTetrominoes() {
 		tetromino = bag.draw();
-		next = new LinkedList<Tetromino>();
+		next = new LinkedList<>();
         for (int i = 0; i < PREVIEW_COUNT; i++) {
             next.add(bag.draw());
 		}
@@ -324,11 +317,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	}
 	
 	public boolean isEmpty(Point[] points) {
-		for (Point point : points) {
-			if (!isEmpty(point))
-				return false;
-		}
-		return true;
+        return Arrays.stream(points).allMatch(this::isEmpty);
 	}
 	
 	public boolean isInside(Point p) {
@@ -346,11 +335,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	}
 	
 	public boolean isLost() {
-		for (Point point : tetromino.getSelection()) {
-			if (!isEmpty(point))
-				return true;
-		}
-		return false;
+        return isEmpty(tetromino.getSelection());
 	}
 	
 	private void moveLinesDown(int n) {
@@ -425,10 +410,13 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
     private void renderProgressBar(Screen screen) {
 		int lClear = linesCleared;
-		if (lClear < 0)
-			lClear = 0;
+		if (lClear < 0) {
+            lClear = 0;
+        }
 		int offset = HEIGHT/GOAL_LINES * lClear;
-		if (offset > HEIGHT) offset = HEIGHT;
+		if (offset > HEIGHT) {
+            offset = HEIGHT;
+        }
 		
 		screen.renderBlank(getX(), getY()+offset, WIDTH-PROGRESS_BAR_WIDTH, HEIGHT-offset, 0xff220000);
 		screen.renderBlank(getX(), getY()+offset, WIDTH-PROGRESS_BAR_WIDTH, 2, 0xff550000);
@@ -438,8 +426,9 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	private void renderTetromino(Screen screen) {
 		for (Point point : tetromino.getSelection()) {
 			int yy = getY() + GameFrame.BLOCK_SCALE * point.getY() - BLOCK_SCALE * HIDDEN_ROWS;
-			if (yy >= getY())
-				screen.render(getX() + GameFrame.BLOCK_SCALE * point.getX(), yy, tetromino.getSprite());
+			if (yy >= getY()) {
+                screen.render(getX() + GameFrame.BLOCK_SCALE * point.getX(), yy, tetromino.getSprite());
+            }
 		}
 	}
 	
@@ -449,20 +438,17 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		ticksSinceMove = 0;
 	}
 	
-	public boolean isWon() {
+	private boolean isWon() {
 		return linesCleared >= GOAL_LINES;
-	}
-	
-	private void addOldTime(Timer timer) {
-
 	}
 	
 	@Override
 	public void tick() {
         if (!paused) {
             if (isWon()) {
-                if (gameOverListener != null)
+                if (gameOverListener != null) {
                     gameOverListener.onGameOver(true);
+                }
             }
             ticksSinceMove++;
             if (ticksSinceMove >= TICKS_PER_MOVE) {
@@ -482,11 +468,11 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     }
 
     public interface NextTetrominoesChangedListener {
-        public void onNextTetrominoesChanged(List<Tetromino> tetrominoes);
+        void onNextTetrominoesChanged(List<Tetromino> tetrominoes);
     }
 
     public interface OnGameOverListener {
-        public void onGameOver(boolean won);
+        void onGameOver(boolean won);
     }
 
     @Override

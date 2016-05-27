@@ -10,7 +10,7 @@ import view.Screen;
 import view.Sprite;
 
 public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListener {
-	private ArrayList<Button> buttons = new ArrayList<Button>();
+	private ArrayList<Button> buttons = new ArrayList<>();
 	private Sprite background;
 	private int pointer;
 	private Button selected;
