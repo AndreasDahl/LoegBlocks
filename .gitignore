@@ -10,3 +10,5 @@ out
 *.jar
 *.class
 LoegBlocks.iml
+LoegBlocks.ipr
+LoegBlocks.iws
