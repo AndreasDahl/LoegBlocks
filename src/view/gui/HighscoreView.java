@@ -8,7 +8,7 @@ import view.Screen;
 import java.util.LinkedList;
 
 class HighscoreView extends GuiComponent {
-	private int scoresShown = 10;
+	private static final int SCORES_SHOWN = 10;
 	private LinkedList<Long> scores;
     private boolean scaleText;
 	
@@ -21,7 +21,7 @@ class HighscoreView extends GuiComponent {
 	}
 	
 	private void refresh() {
-		scores = new DbScoreboard().getTop(scoresShown);
+		scores = new DbScoreboard().getTop(SCORES_SHOWN);
 	}
 
     void setScaleText(boolean scaleText) {
@@ -32,7 +32,7 @@ class HighscoreView extends GuiComponent {
 	public void render(Screen screen) {
 		super.render(screen);
 		
-		int dist = getHeight()/scoresShown;
+		int dist = getHeight() / SCORES_SHOWN;
 		int i = 0;
 		for (Long score : scores) {
             if (scaleText)

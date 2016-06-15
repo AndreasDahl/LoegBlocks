@@ -25,10 +25,9 @@ public class GameView extends GuiComponent implements
         Board.OnGameOverListener,
         InputHandler.OnToggleListener {
     private Board board;
-    private LinkedList<Preview> next;
-    private Preview hold;
+    private final LinkedList<Preview> next;
     private PauseMenu pauseMenu;
-    private Timer timer;
+    private final Timer timer;
 
     public GameView() {
         super();
@@ -50,8 +49,7 @@ public class GameView extends GuiComponent implements
 
         board.setNextTetrominoesChangedListener(this);
 
-        this.hold = board.getHoldPreivew();
-        addChild(hold, 24, 24);
+        addChild(board.getHoldPreivew(), 24, 24);
 
         HighscoreView highscores = new HighscoreView(board.getX() - 48, 110);
         highscores.setScaleText(false);
@@ -101,7 +99,7 @@ public class GameView extends GuiComponent implements
         super.tick();
     }
 
-    public void pauseGame() {
+    private void pauseGame() {
         board.pause();
         pauseMenu = new PauseMenu(this, getWidth(), getHeight());
         this.addChild(pauseMenu, 0,0);

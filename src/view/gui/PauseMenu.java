@@ -4,12 +4,8 @@ import view.Art;
 import view.GameFrame;
 
 class PauseMenu extends GuiMenu {
-    private GameView gameView;
-
     PauseMenu(final GameView gameView, int width, int height) {
         super(width, height);
-
-        this.gameView = gameView;
 
         Button resume = new Button(200, 100, Art.BUTTON, "Resume");
         resume.addButtonListener(gameView::unPauseGame);

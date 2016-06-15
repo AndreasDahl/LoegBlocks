@@ -1,10 +1,8 @@
 package model;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.jetbrains.annotations.NotNull;
+
+import java.sql.*;
 import java.util.LinkedList;
 
 // TODO: Run in seperate thread
@@ -21,49 +19,39 @@ public class DbScoreboard {
 	
 	//Makes sure that the necessary table is there
 	private void ensureStructure() {
-		Statement s = openStatement();
-		try {
-			ResultSet rs = s.executeQuery("SELECT time FROM scores");
+		try (Statement statement = openStatement()) {
+			ResultSet rs = statement.executeQuery("SELECT time FROM scores");
 		} catch (SQLException e) {
 			try {
+                Statement s = openStatement();
 				s.executeUpdate("CREATE TABLE scores(" +
 						"time INT)");
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
 		}
-		closeStatement(s);
 	}
-	
-	private Statement openStatement() {
-		Connection c;
-		try {
-			c = DriverManager.getConnection("jdbc:sqlite:Scoreboard.db");
-			c.setAutoCommit(false);
-			return c.createStatement();
-		} catch (SQLException e) {
-			//TODO: Something Smart
-			e.printStackTrace();
-			return null;
-		}
+
+    private @NotNull Statement openStatement() throws SQLException {
+		Connection c = DriverManager.getConnection("jdbc:sqlite:Scoreboard.db");
+		c.setAutoCommit(false);
+		return c.createStatement();
 	}
-	
-	private void closeStatement(Statement s) {
-		try {
-			Connection c = s.getConnection();
-			c.commit();
-			s.close();
-			c.close();
+
+	private void closeStatement(Statement statement) {
+		try (Connection connection = statement.getConnection();) {
+			connection.commit();
+			statement.close();
+			connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public LinkedList<Long> getTop(int n) {
-		Statement s = openStatement();
-		LinkedList<Long> result = new LinkedList<>();
-		try {
-			ResultSet rs = s.executeQuery(	"SELECT * " + 
+		try (Statement statement = openStatement();) {
+			LinkedList<Long> result = new LinkedList<>();
+			ResultSet rs = statement.executeQuery(	"SELECT * " +
 					"FROM scores " +
 					"ORDER BY time " +
 					"LIMIT " + n);
@@ -73,41 +61,36 @@ public class DbScoreboard {
 			}
 			return result;
 		} catch (SQLException e) {
+            // FIXME
 			e.printStackTrace();
 			return new LinkedList<>();
-		}
-		finally {
-			closeStatement(s);
 		}
 	}
 	
 	public LinkedList<Long> loadAllScores() {
-		Statement s = openStatement();
+
 		ResultSet rs;
 		LinkedList<Long> result = new LinkedList<>();
-		try {
+		try (Statement s = openStatement();) {
 		    rs = s.executeQuery("SELECT time FROM scores");
 			result = new LinkedList<>();
 		    while (rs.next()) {
 		    	result.add(rs.getLong("time"));
 		    }
 		} catch (SQLException e) {
+            // FIXME
 			e.printStackTrace();
 		}
-		
-		closeStatement(s);
 		return result;
 	}
 	
-	private void saveScore(long score) {
-		Statement s = openStatement();
-		try {
+	private void saveScore(long score){
+		try (Statement s = openStatement()) {
 			s.executeUpdate("INSERT INTO scores VALUES (" + score + ")");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		closeStatement(s);
 	}
 	
 	public void add(long score) {

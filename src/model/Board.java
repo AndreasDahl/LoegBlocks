@@ -83,10 +83,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
     private boolean leftPressed, rightPressed, downPressed;
     private boolean paused;
 
-	//private static Board current;
-
-
-
    	public Board() {
    		super();
 		bag = new TetrominoBag();
@@ -98,14 +94,6 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 
 		scoreboard = new DbScoreboard();
 	}
-
-	/*public static Board getCurrent() {
-		if (current == null)
-			current = new Board();
-		return current;
-	}*/
-
-
 
 	private void addBlock(Point position, Type type) {
 		rows[position.getY()][position.getX()] = new Block(type);
@@ -137,18 +125,14 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         return hold;
     }
 	
-	public void clearFullLines() {
-		for (int i = 0; i < rows.length; i++) {
+	private void clearFullLines() {
+        for (int i = 0; i < rows.length; i++) {
 			if (clearLineIfFull(i))
 				linesCleared++;
 		}
 	}
 
-    public Collection<Tetromino> getNextTetrominoes() {
-        return next;
-    }
-	
-	public boolean clearLineIfFull(int lineN) {
+	private boolean clearLineIfFull(int lineN) {
 		Block[] line = rows[lineN];
 		if (isLineFull(line)) {
 			for (int i = 0; i < line.length; i++) {
@@ -166,7 +150,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		return null;
 	}
 	
-	public void getNextTetromino() {
+	private void getNextTetromino() {
         // Get next tetromino and generate new one
         Iterator<Tetromino> it = next.iterator();
         if (it.hasNext()) {
@@ -187,15 +171,11 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 		}
 	}
 	
-	public Block[][] getRows() {
-		return rows;
-	}
-	
 	public Tetromino getTetromino() {
 		return tetromino;
 	}
 	
-	public void hold() {
+	private void hold() {
 		if (hold.isEnabled()) {
             hold.setEnabled(false);
 			if (hold.getTetromino() == null) {
@@ -282,23 +262,23 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         else timeToNextDownMove = 0;
     }
 
-    public void hardDrop() {
+    private void hardDrop() {
         while (tetromino.tryMove(this, Direction.DOWN));
         placeTetromino();
     }
 
-    public void softDrop() {
+    private void softDrop() {
         boolean hasDropped = false;
         while (tetromino.tryMove(this, Direction.DOWN)) hasDropped = true;
         if (hasDropped)
             resetTicksSinceMove();
     }
 
-    public void moveAllLeft() {
+    private void moveAllLeft() {
         tetromino.moveToEnd(this, Direction.LEFT);
     }
 
-    public void moveAllRight() {
+    private void moveAllRight() {
         tetromino.moveToEnd(this, Direction.RIGHT);
     }
 
@@ -320,21 +300,17 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
         return Arrays.stream(points).allMatch(this::isEmpty);
 	}
 	
-	public boolean isInside(Point p) {
+	private boolean isInside(Point p) {
 		int x = p.getX();
 		int y = p.getY();
 		return x >= 0 && y >= 0 && x < rows[0].length  && y < rows.length;
 	}
 	
-	public boolean isLineFull(Block[] line) {
-		for (Block block : line) {
-			if (block == null)
-				return false;
-		}
-		return true;
+	private boolean isLineFull(Block[] line) {
+        return Arrays.stream(line).allMatch(block -> block != null);
 	}
 	
-	public boolean isLost() {
+	private boolean isLost() {
         return isEmpty(tetromino.getSelection());
 	}
 	
@@ -352,9 +328,7 @@ public class Board extends GuiComponent implements InputHandler.OnToggleListener
 	
 	public void placeTetromino() {
 		hold.setEnabled(true);
-		for (Point point : tetromino.getSelection()) {
-			addBlock(point, tetromino.getType());
-		}
+        Arrays.stream(tetromino.getSelection()).forEach(point -> addBlock(point, tetromino.getType()));
 		this.getNextTetromino();
 		clearFullLines();
 	}

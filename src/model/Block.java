@@ -3,7 +3,7 @@ package model;
 import model.tetromino.Tetromino.Type;
 
 class Block {
-	private Type type;
+	private final Type type;
 	
 	Block(Type type) {
 		this.type = type;
@@ -11,9 +11,5 @@ class Block {
 
 	public Type getType() {
 		return this.type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
 	}
 }

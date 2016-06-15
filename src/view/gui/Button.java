@@ -1,20 +1,21 @@
 package view.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jetbrains.annotations.Nullable;
 import view.Art;
 import view.Screen;
 import view.Sprite;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Button extends GuiComponent {
 
-	private List<ButtonListener> listeners = new ArrayList<>();
+	private final List<ButtonListener> listeners = new ArrayList<>();
 	
-	private Sprite sprite;
+	private final Sprite sprite;
 	private boolean isPressed = false;
 	private boolean isHovered = false;
-	private String text;
+	private final @Nullable String text;
 	
 	
 	public Button(int width, int height, Sprite sprite) {
@@ -23,14 +24,14 @@ public class Button extends GuiComponent {
 		this.text = null;
 	}
 	
-	public Button(int width, int height, Sprite sprite, String text) {
+	public Button(int width, int height, Sprite sprite, @Nullable String text) {
 		super(width, height);
 		this.sprite = sprite;
 		this.text = text;
 	}
 	
 	public void tick() {
-		if (isPressed == true) {
+		if (isPressed) {
 			for (ButtonListener listener : listeners) {
 				System.out.println("Handling press");
 				listener.buttonPressed();
@@ -61,7 +62,6 @@ public class Button extends GuiComponent {
 		
 		screen.render(getX(), getY(), getHeight(), getWidth(), sprite);
 		if (text != null) {
-			int textLength = text.length();
 			Art.FONT.render(getX()+(getWidth()-Art.FONT.getStringWidth(text))/2, getY()+(getHeight())/2 - (Art.FONT.getHeight()/2), text, screen);
 		}
 		

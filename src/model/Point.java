@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 /**
  * A point in a tetris board. Measured with the x-axis going right and the y-axis going downwards.
  * @author Andreas
@@ -15,7 +17,7 @@ public class Point {
 	 * @param  y  the y-coordinate 
 	 */
 	public Point(int x, int y) {
-	this.x = x;
+		this.x = x;
 		this.y = y;
 	}
 	
@@ -61,7 +63,7 @@ public class Point {
 	
 	@Override
 	public int hashCode() {
-		return x + 1000*y;
+		return Objects.hash(x, y);
 	}
 	
 	@Override
@@ -85,13 +87,13 @@ public class Point {
 	 * @param  y  y-coordinate to be added
 	 * @return  this point. After translation
 	 */
-	public Point translate(int x, int y) {
+	private Point translate(int x, int y) {
 		this.x += x;
 		this.y += y;
 		return this;
 	}
 	
-	public static Point translate(int x1, int y1, int x2, int y2) {
+	private static Point translate(int x1, int y1, int x2, int y2) {
 		return new Point(x1+x2, y1+y2);
 	}
 	

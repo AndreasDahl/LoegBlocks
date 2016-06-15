@@ -13,8 +13,8 @@ class TetrominoBag {
 	private static final Type[] index = { Type.I, Type.O, Type.T, Type.Z, Type.S, Type.L, Type.J };
 
 	
-	private Type[] tetrominos;
-	private Random rand;
+	private final Type[] tetrominos;
+	private final Random rand;
 	private int pointer;
 
 	TetrominoBag() {

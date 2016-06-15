@@ -90,16 +90,12 @@ public abstract class GuiComponent {
 
     public synchronized void tick() {
         ArrayList<GuiComponent> tmpList = (ArrayList<GuiComponent>) children.clone();
-        for (GuiComponent child : tmpList) {
-            child.tick();
-        }
+        tmpList.forEach(GuiComponent::tick);
     }
 
     public synchronized void render(Screen screen) {
         screen.renderBlank(getX(), getY(), getWidth(), getHeight(), backgroundColor);
-        for (GuiComponent child : children) {
-            child.render(screen);
-        }
+        children.forEach(child -> child.render(screen));
     }
 
     public synchronized void activate() {

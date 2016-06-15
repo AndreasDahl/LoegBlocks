@@ -1,16 +1,15 @@
 package view.gui;
 
-import java.util.ArrayList;
-
 import controller.InputHandler;
-
 import controller.Key;
 import view.GameFrame;
 import view.Screen;
 import view.Sprite;
 
+import java.util.ArrayList;
+
 public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListener {
-	private ArrayList<Button> buttons = new ArrayList<>();
+	private final ArrayList<Button> buttons = new ArrayList<>();
 	private Sprite background;
 	private int pointer;
 	private Button selected;
@@ -55,10 +54,8 @@ public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListen
 			oldSelected.unHover();
 			selected.hover();
 		}
-		
-		for (Button button : buttons) {
-			button.tick();
-		}
+
+		buttons.forEach(Button::tick);
 	}
 
     private void selectionUp() {
@@ -86,7 +83,7 @@ public class GuiMenu extends GuiComponent implements InputHandler.OnToggleListen
 		return pointer;
 	}
 	
-	protected void addButton(Button button, int x, int y) {
+	void addButton(Button button, int x, int y) {
         addChild(button, x, y);
 		buttons.add(button);
 	}

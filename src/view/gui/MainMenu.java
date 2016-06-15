@@ -4,7 +4,7 @@ import view.Art;
 import view.GameFrame;
 
 public class MainMenu extends GuiMenu {
-	private Button startGame;
+	private final Button startGame;
     private TextComponent scoreText;
 	
 	public MainMenu() {
